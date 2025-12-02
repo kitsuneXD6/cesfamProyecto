@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,7 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Se recomienda encarecidamente cambiar esta clave y cargarla desde una variable de entorno.
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-cambia-esto-por-una-clave-segura')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if SECRET_KEY is None:
+    SECRET_KEY = 'django-insecure-cambia-esto-por-una-clave-segura'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # El modo DEBUG no debe estar activado en producción.
@@ -33,10 +36,10 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 if not DEBUG and SECRET_KEY == 'django-insecure-cambia-esto-por-una-clave-segura':
     raise ValueError(
         "La SECRET_KEY por defecto no puede ser usada en producción. "
-        "Debe configurar la variable de entorno DJANGO_SECRET_KEY."
+        "Debe configurar la variable de entorno SECRET_KEY."
     )
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1').split(',')
 
 
 # Application definition
@@ -54,6 +57,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -86,15 +90,11 @@ WSGI_APPLICATION = 'cesfamProyecto.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# La base de datos de desarrollo (MySQL) se mantiene, pero Render usará la DATABASE_URL.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cesfam',
-        'USER': 'root',
-        'PASSWORD': 'admin',
-        'HOST': '127.0.0.1',
-        'PORT': '3307',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
+    )
 }
 
 
@@ -135,6 +135,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # Default primary key field type
@@ -144,4 +145,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Configuración del modelo de usuario personalizado
 AUTH_USER_MODEL = 'cesfamApp.CustomUser'
-
