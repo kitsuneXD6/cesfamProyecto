@@ -1,0 +1,11 @@
+# Establece el comportamiento por defecto para todos los archivos.
+# Git normalizará los finales de línea a LF en el repositorio.
+* text=auto
+
+# Declara explícitamente los archivos que son de texto.
+*.py text
+*.html text
+*.css text
+*.js text
+*.json text
+*.md text
