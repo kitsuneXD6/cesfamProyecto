@@ -1,0 +1,130 @@
+/* =================================================================
+   ESTILOS GENERALES Y TIPOGRAFÍA
+   ================================================================= */
+html {
+    font-size: 17px;
+}
+
+body {
+    font-family: 'Lato', Arial, sans-serif;
+    color: #4A5568;
+    line-height: 1.6;
+    background-color: #f7fafc; /* Un gris muy claro para el fondo */
+    padding-top: 70px; /* Espacio para la navbar fija */
+}
+
+h1, h2, h3, h4, h5, h6, .section-title {
+    font-family: 'Montserrat', 'Lato', Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #2C7A7B; /* Verde azulado oscuro para títulos */
+}
+
+.section-title {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+/* =================================================================
+   COMPONENTES PERSONALIZADOS (BOTONES, TARJETAS, ETC.)
+   ================================================================= */
+
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 16px #2C7A7B1A, 0 1.5px 8px #38A1691A;
+    border: 1px solid #E2E8F0;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 32px #2C7A7B33, 0 1.5px 8px #38A16922;
+    transform: translateY(-4px);
+}
+
+.btn, .nav-link { 
+    transition: all 0.2s ease;
+    border-radius: 0.375rem; /* Bootstrap 5 default */
+}
+
+.btn:focus, .nav-link:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px #38A16955 !important;
+}
+
+/* Botón con gradiente personalizado */
+.btn-gradient {
+    background: linear-gradient(90deg, #00897b 0%, #43cea2 100%);
+    color: #fff;
+    border: none;
+}
+.btn-gradient:hover { 
+    color: #fff;
+    filter: brightness(1.1); 
+}
+
+/* Badge para roles de usuario */
+.badge-role {
+    font-size: 0.8em;
+    padding: 0.4em 0.7em;
+    border-radius: 1em;
+    background: #E2E8F0;
+    color: #2D3748;
+}
+
+/* =================================================================
+   COMPONENTES ESPECÍFICOS (NAVBAR, FOOTER, ETC.)
+   ================================================================= */
+
+.app-navbar {
+    background: linear-gradient(90deg, #00897b 0%, #43cea2 100%);
+    box-shadow: 0 2px 8px #00897b33;
+}
+
+.navbar-brand span {
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.footer {
+    background: #fff;
+    border-top: 1px solid #E2E8F0;
+    padding: 24px 0;
+    color: #718096;
+}
+
+/* =================================================================
+   UTILIDADES Y ANIMACIONES
+   ================================================================= */
+
+.fade-in { 
+    animation: fadeInDown 0.7s; 
+}
+
+@keyframes fadeInDown { 
+    from { opacity: 0; transform: translateY(-20px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+.table th, .table td { 
+    vertical-align: middle !important; 
+}
+
+.alert {
+    border-radius: 12px;
+}
+
+.list-group-item {
+    border-radius: 10px !important;
+    margin-bottom: 6px;
+    border: 1px solid #E2E8F0;
+}
+
+@media (max-width: 768px) { 
+    body {
+        padding-top: 60px;
+    }
+    .container { 
+        margin-top: 20px; 
+    } 
+}

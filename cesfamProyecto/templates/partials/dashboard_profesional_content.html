@@ -1,0 +1,107 @@
+<div class="row g-4">
+    <!-- Columna Izquierda: Métricas y Citas -->
+    <div class="col-lg-8">
+        <!-- Métricas -->
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="fas fa-calendar-day fa-3x text-primary mb-2"></i>
+                        <h3 class="fw-bold mb-0">{{ citas_hoy }}</h3>
+                        <p class="text-muted mb-0">Citas para Hoy</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-3x text-info mb-2"></i>
+                        <h3 class="fw-bold mb-0">{{ pacientes_unicos }}</h3>
+                        <p class="text-muted mb-0">Pacientes Únicos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                 <div class="card text-center shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="fas fa-chart-line fa-3x text-success mb-2"></i>
+                        <h3 class="fw-bold mb-0">{{ total_citas }}</h3>
+                        <p class="text-muted mb-0">Citas Totales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximas Citas -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-white border-bottom-0 py-3">
+                <h5 class="section-title mb-0"><i class="fas fa-calendar-check text-success me-2"></i>Próximas Citas</h5>
+            </div>
+            <div class="card-body">
+                {% if proximas_citas %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Fecha y Hora</th>
+                                    <th>Servicio</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cita in proximas_citas %}
+                                    <tr>
+                                        <td>{{ cita.paciente.get_full_name }}</td>
+                                        <td>{{ cita.fecha_hora|date:"d/m, H:i" }}h</td>
+                                        <td>{{ cita.servicio.nombre }}</td>
+                                        <td>
+                                            <a href="#" class="btn btn-sm btn-outline-primary">Ver Ficha</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-light text-center border-0" role="alert">
+                        <i class="fas fa-calendar-alt fa-2x mb-2 text-muted"></i>
+                        <p class="mb-0">No tienes próximas citas agendadas.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Columna Derecha: Información y Acciones -->
+    <div class="col-lg-4">
+        <!-- Información del Profesional -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white border-bottom-0 py-3">
+                 <h5 class="section-title mb-0"><i class="fas fa-user-md text-primary me-2"></i>Tu Perfil Profesional</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><strong>Nombre:</strong><br>{{ user.get_full_name }}</li>
+                    <li class="mb-2"><strong>Especialidad:</strong><br>{{ user.especialidad|default:"No especificada" }}</li>
+                    <li class="mb-2"><strong>Email:</strong><br>{{ user.email }}</li>
+                </ul>
+                <hr>
+                <a href="#" class="btn btn-outline-secondary btn-sm"><i class="fas fa-edit me-1"></i>Editar Perfil</a>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="card shadow-sm">
+             <div class="card-header bg-white border-bottom-0 py-3">
+                <h5 class="section-title mb-0"><i class="fas fa-bolt text-warning me-2"></i>Acciones Rápidas</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'profesional_agendar' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-calendar-plus fa-fw me-2 text-primary"></i>Agendar Cita a Paciente</a>
+                <a href="{% url 'horario' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-clock fa-fw me-2 text-info"></i>Gestionar Horarios</a>
+                <a href="{% url 'gestionar_anuncios' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-bullhorn fa-fw me-2 text-success"></i>Publicar Anuncio</a>
+                <a href="#" class="list-group-item list-group-item-action p-3"><i class="fas fa-users fa-fw me-2 text-secondary"></i>Ver mis Pacientes</a>
+            </div>
+        </div>
+    </div>
+</div>

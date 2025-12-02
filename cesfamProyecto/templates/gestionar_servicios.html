@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Gestionar Servicios | CESFAM{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4 section-title"><i class="fa fa-notes-medical text-info me-2"></i> Gestión de Especialidades y Servicios</h2>
+  <form method="post" class="card p-3 mb-4 shadow-sm">
+    {% csrf_token %}
+    <div class="row g-2">
+      <div class="col"><input type="text" name="nombre" class="form-control" placeholder="Nombre del Servicio" required></div>
+      <div class="col"><input type="text" name="tipo" class="form-control" placeholder="Tipo o Especialidad" required></div>
+      <div class="col"><input type="text" name="descripcion" class="form-control" placeholder="Descripción" required></div>
+      <div class="col-auto"><button type="submit" name="crear" class="btn btn-gradient-dark"><i class="fa fa-plus" aria-label="Crear servicio"></i> Crear</button></div>
+    </div>
+  </form>
+  <h4 class="section-title">Servicios Registrados</h4>
+  <div class="row g-4 mb-4">
+    {% for s in servicios %}
+      <div class="col-md-4">
+        <div class="service-card card h-100 text-center p-3">
+          <div class="service-icon mb-2">
+            <i class="fa fa-stethoscope fa-2x text-info" aria-label="Servicio"></i>
+          </div>
+          <h5 class="mt-2 mb-1">{{ s.nombre }}</h5>
+          <div class="text-success mb-1">{{ s.tipo }}</div>
+          <p class="small text-muted">{{ s.descripcion }}</p>
+          <form method="post" style="margin:0;">
+            {% csrf_token %}
+            <input type="hidden" name="id_servicio" value="{{ s.id_servicio }}">
+            <button type="submit" name="eliminar" class="btn btn-danger btn-sm mt-2"><i class="fa fa-trash" aria-label="Eliminar servicio"></i></button>
+          </form>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12"><div class="alert alert-info" role="alert">No hay servicios registrados.</div></div>
+    {% endfor %}
+  </div>
+  <a href="/dashboard" class="btn btn-gradient-dark mt-3"><i class="fa fa-arrow-left" aria-label="Volver"></i> Volver al panel</a>
+</div>
+<style>
+.service-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 24px 16px;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(44, 122, 123, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px -2px #2C7A7B33;
+}
+.service-card h5 {
+  margin-top: 12px;
+  margin-bottom: 4px;
+  font-family: 'Montserrat', 'Lato', Arial, sans-serif;
+  color: #2C7A7B;
+  font-weight: 700;
+}
+.card-button, .btn-gradient-dark {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 20px;
+  background-color: #38A169;
+  color: #FFFFFF;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+}
+</style>
+{% endblock %}

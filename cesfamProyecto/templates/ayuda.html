@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Ayuda y Tour | CESFAM{% endblock %}
+{% block content %}
+<!-- Bootstrap CDN -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col text-center">
+            <h1 class="display-5 fw-bold">Centro de Ayuda CESFAM</h1>
+            <p class="lead">Encuentra respuestas y soporte según tu rol en la plataforma.</p>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Usuario</h5>
+                    <ul class="list-unstyled">
+                        <li>• ¿Cómo ver mi historial médico?</li>
+                        <li>• ¿Cómo agendar una cita?</li>
+                        <li>• ¿Cómo enviar feedback?</li>
+                        <li>• ¿Cómo recuperar mi contraseña?</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Profesional</h5>
+                    <ul class="list-unstyled">
+                        <li>• ¿Cómo consultar historial de pacientes?</li>
+                        <li>• ¿Cómo gestionar horarios?</li>
+                        <li>• ¿Cómo enviar notificaciones?</li>
+                        <li>• ¿Cómo actualizar datos de atención?</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">Administrador</h5>
+                    <ul class="list-unstyled">
+                        <li>• ¿Cómo gestionar usuarios y profesionales?</li>
+                        <li>• ¿Cómo revisar reportes?</li>
+                        <li>• ¿Cómo modificar configuraciones?</li>
+                        <li>• ¿Cómo responder feedback?</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col text-center">
+            <a href="/" class="btn btn-outline-primary">Volver al inicio</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

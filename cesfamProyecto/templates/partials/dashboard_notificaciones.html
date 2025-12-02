@@ -1,0 +1,15 @@
+<div class="mb-4">
+  <h5 class="section-title"><i class="fa fa-bell text-primary me-2"></i> Notificaciones</h5>
+  {% if notificaciones %}
+    <ul class="list-group mb-2">
+      {% for noti in notificaciones %}
+        <li class="list-group-item {% if not noti.leida %}list-group-item-warning{% endif %}">
+          <span>{{ noti.mensaje }}</span>
+          <span class="text-muted small float-end">{{ noti.fecha|date:'d/m/Y H:i' }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-info" role="alert">No tienes notificaciones recientes.</div>
+  {% endif %}
+</div>

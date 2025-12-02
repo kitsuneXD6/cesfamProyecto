@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Registro de Profesional | CESFAM{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8 col-lg-7 col-xl-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header text-white text-center py-3" style="background-color: #2C7A7B;">
+                    <h3 class="fw-bold my-2"><i class="fas fa-user-md me-2"></i>Registro de Profesional</h3>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    {% if messages %}
+                        <div class="mb-3">
+                            {% for message in messages %}
+                                <div class="alert alert-danger" role="alert">{{ message }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" class="needs-validation" novalidate action="{% url 'register_profesional' %}" autocomplete="off">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Nombre" required autocomplete="given-name">
+                                    <label for="nombre">Nombre</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="apellido" id="apellido" class="form-control" placeholder="Apellido" required autocomplete="family-name">
+                                    <label for="apellido">Apellido</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="email" name="email" id="email" class="form-control" placeholder="Email" required autocomplete="email">
+                                    <label for="email">Correo electrónico (será tu usuario)</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" name="especialidad" id="especialidad" class="form-control" placeholder="Especialidad" required>
+                                    <label for="especialidad">Especialidad (ej: Medicina General)</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="password" name="password" id="password" class="form-control" placeholder="Contraseña" required autocomplete="new-password" minlength="8">
+                                    <label for="password">Contraseña (mínimo 8 caracteres)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button class="btn btn-primary fw-bold btn-lg" type="submit" style="background-color: #2C7A7B; border-color: #2C7A7B;"><i class="fas fa-user-plus me-2"></i>Crear cuenta profesional</button>
+                        </div>
+                    </form>
+
+                    <script>
+                      // Script para validación de Bootstrap
+                      (function () {
+                        'use strict'
+                        var forms = document.querySelectorAll('.needs-validation')
+                        Array.prototype.slice.call(forms)
+                          .forEach(function (form) {
+                            form.addEventListener('submit', function (event) {
+                              if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                              }
+                              form.classList.add('was-validated')
+                            }, false)
+                          })
+                      })()
+                    </script>
+
+                </div>
+                <div class="card-footer text-center py-3">
+                    <a href="{% url 'register_page' %}"><i class="fas fa-arrow-left me-1"></i>Volver a la selección</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Panel Administrador | CESFAM{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg border-0 mb-4 fade-in">
+    <div class="card-header bg-gradient-dark text-white d-flex align-items-center" style="background: linear-gradient(90deg, #00897b 0%, #43cea2 100%);">
+      <img src="https://cdn-icons-png.flaticon.com/512/616/616494.png" alt="avatar admin" class="avatar-default me-3">
+      <span class="fs-5">Panel exclusivo de Administrador CESFAM</span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex align-items-center mb-3">
+        <span class="fs-5 fw-bold me-2">{{ user_name }}</span>
+        <span class="badge badge-role">Administrador</span>
+      </div>
+      <hr>
+      <div class="row mb-4">
+        <div class="col-md-3 mb-2">
+          <div class="card text-center border-success shadow-sm fade-in">
+            <div class="card-body">
+              <div class="fs-2 text-success"><i class="fa fa-hospital"></i></div>
+              <div class="fw-bold">Total CESFAMs</div>
+              <div class="display-6">{{ resumen.total_cesfams }}</div>
+              <a href="/cesfam/" class="btn btn-gradient-dark btn-sm mt-2"><i class="fa fa-list"></i> Ver CESFAMs</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-2">
+          <div class="card text-center border-primary shadow-sm fade-in">
+            <div class="card-body">
+              <div class="fs-2 text-primary"><i class="fa fa-user-doctor"></i></div>
+              <div class="fw-bold">Total Profesionales</div>
+              <div class="display-6">{{ resumen.total_profesionales }}</div>
+              <a href="/profesionales/" class="btn btn-gradient-dark btn-sm mt-2"><i class="fa fa-list"></i> Gestionar Profesionales</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-2">
+          <div class="card text-center border-info shadow-sm fade-in">
+            <div class="card-body">
+              <div class="fs-2 text-info"><i class="fa fa-users"></i></div>
+              <div class="fw-bold">Total Usuarios</div>
+              <div class="display-6">{{ resumen.total_usuarios }}</div>
+              <a href="/usuarios/" class="btn btn-gradient-dark btn-sm mt-2"><i class="fa fa-list"></i> Gestionar Usuarios</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-2">
+          <div class="card text-center border-warning shadow-sm fade-in">
+            <div class="card-body">
+              <div class="fs-2 text-warning"><i class="fa fa-chart-bar"></i></div>
+              <div class="fw-bold">Reportes y Feedback</div>
+              <a href="/feedback/" class="btn btn-warning btn-sm mt-2"><i class="fa fa-comment-dots"></i> Ver Feedback</a>
+              <a href="/dashboard_admin/" class="btn btn-warning btn-sm mt-2"><i class="fa fa-chart-bar"></i> Ver Reportes</a>
+              <a href="/dashboard_metricas/" class="btn btn-warning btn-sm mt-2"><i class="fa fa-chart-bar"></i> Ver Métricas</a>
+              <a href="/supervisar_agendas/" class="btn btn-info btn-sm mt-2"><i class="fa fa-calendar-alt"></i> Supervisar Agendas</a>
+              <a href="/servicios/" class="btn btn-info btn-sm mt-2"><i class="fa fa-notes-medical"></i> Gestionar Servicios</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end mt-3">
+        <a href="/ayuda/" class="btn btn-outline-info me-2"><i class="fa fa-question-circle"></i> Ayuda</a>
+        <a href="/logout/" class="btn btn-outline-danger"><i class="fa fa-sign-out-alt"></i> Cerrar sesión</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

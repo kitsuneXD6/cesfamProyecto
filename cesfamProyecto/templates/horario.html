@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Horarios | CESFAM{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg border-0 mb-4 fade-in">
+    <div class="card-header text-white" style="background: linear-gradient(90deg, #00897b 0%, #43cea2 100%);">
+      <span class="fs-5"><i class="fa fa-calendar-alt me-2"></i> Horarios</span>
+    </div>
+    <div class="card-body">
+      {% if horarios %}
+        <ul class="list-group mb-4">
+          {% for h in horarios %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <b>Día:</b> {{ h.dia }}<br>
+                <b>Hora inicio:</b> {{ h.hora_inicio }}<br>
+                <b>Hora fin:</b> {{ h.hora_fin }}<br>
+                {% if rol == 'usuario' or rol == 'admin' %}
+                  <b>Profesional:</b> {{ h.profesional.nombre }}
+                {% endif %}
+                {% if h.bloqueado %}
+                  <span class="badge bg-danger ms-2">Bloqueado</span>
+                {% endif %}
+              </div>
+              {% if rol == 'profesional' %}
+                <form method="post" style="margin:0;">
+                  {% csrf_token %}
+                  <input type="hidden" name="id_horario" value="{{ h.id_horario }}">
+                  <button class="btn btn-sm {% if h.bloqueado %}btn-success{% else %}btn-warning{% endif %}">
+                    {% if h.bloqueado %}<i class="fa fa-lock-open"></i> Desbloquear{% else %}<i class="fa fa-lock"></i> Bloquear{% endif %}
+                  </button>
+                </form>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="alert alert-info">No hay horarios disponibles.</div>
+      {% endif %}
+      <a href="/dashboard" class="btn btn-gradient-dark mt-3"><i class="fa fa-arrow-left"></i> Volver al panel</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

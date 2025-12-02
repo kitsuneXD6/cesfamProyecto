@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Agendar Cita - Paso 2 | CESFAM{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <div class="text-center mt-4 mb-5">
+        <h1 class="display-5 fw-bold">Agendar Cita</h1>
+        <p class="lead text-muted">Paso 2 de 3: Selecciona un profesional para el servicio de <strong>{{ servicio.nombre }}</strong>.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header py-3">
+                    <h5 class="mb-0">Profesionales Disponibles</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for profesional in profesionales %}
+                        <a href="{% url 'agendar_cita_paso3' profesional.id servicio.id %}" class="list-group-item list-group-item-action p-3">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1 fw-bold">{{ profesional.get_full_name }}</h6>
+                                <small class="text-muted"><i class="fas fa-chevron-right"></i></small>
+                            </div>
+                            <p class="mb-1 text-muted">{{ profesional.especialidad }}</p>
+                        </a>
+                    {% empty %}
+                        <div class="list-group-item p-3">
+                            <div class="alert alert-warning mb-0">No hay profesionales disponibles para este servicio en este momento.</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                 <a href="{% url 'agendar_cita_paso1' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Volver a Servicios</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

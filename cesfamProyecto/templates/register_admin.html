@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Registro Administrador | CESFAM{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-7 col-lg-6">
+    <div class="card shadow-lg border-0 rounded-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #b2dfdb 100%);">
+      <div class="card-header d-flex align-items-center" style="background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%);">
+        <img src="https://cdn-icons-png.flaticon.com/512/616/616494.png" alt="CESFAM" style="width:40px;height:40px;border-radius:50%;margin-right:12px;">
+        <span class="fs-5 text-white">Registro de Administrador CESFAM</span>
+      </div>
+      <div class="card-body p-4">
+        {% if messages %}
+          <div class="mb-4">
+            <div class="alert alert-danger shadow-sm fade-in" role="alert">
+              <ul class="mb-0 ps-3">
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+        <form method="post" class="needs-validation" novalidate action="{% url 'register_admin' %}" autocomplete="off">
+          {% csrf_token %}
+          <input type="hidden" name="tipo_registro" value="admin">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="nombre" class="form-label">Nombre completo</label>
+              <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Ej: Ana Torres" required autocomplete="given-name">
+              <div class="invalid-feedback">Ingrese su nombre completo.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="especialidad" class="form-label">Especialidad</label>
+              <input type="text" name="especialidad" id="especialidad" class="form-control" placeholder="Ej: Gestión en Salud" required autocomplete="organization-title">
+              <div class="invalid-feedback">Ingrese su especialidad.</div>
+            </div>
+            <div class="col-md-12">
+              <label for="email" class="form-label">Correo institucional</label>
+              <input type="email" name="email" id="email" class="form-control" placeholder="Ej: ana.torres@cesfam.cl" required autocomplete="email">
+              <div class="invalid-feedback">Ingrese un correo válido.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="usuario" class="form-label">Nombre de usuario</label>
+              <input type="text" name="usuario" id="usuario" class="form-control" placeholder="Ej: atorres" required autocomplete="username">
+              <div class="invalid-feedback">Ingrese un nombre de usuario único.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="password" class="form-label">Contraseña</label>
+              <input type="password" name="password" id="password" class="form-control" placeholder="Contraseña segura" required autocomplete="new-password" minlength="8">
+              <div class="invalid-feedback">La contraseña debe tener al menos 8 caracteres.</div>
+            </div>
+          </div>
+          <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-gradient-dark"><i class="fa fa-shield-alt me-1"></i> Registrar administrador</button>
+          </div>
+        </form>
+        <script>
+          (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+              .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                  if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                  }
+                  form.classList.add('was-validated')
+                }, false)
+              })
+          })()
+        </script>
+        <div class="mt-4 text-center">
+          <a href="{% url 'register_select' %}" class="btn btn-link"><i class="fa fa-arrow-left"></i> Volver a selección</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

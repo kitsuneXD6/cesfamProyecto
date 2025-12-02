@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Panel Usuario | CESFAM{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg border-0 mb-4 fade-in">
+    <div class="card-header bg-gradient-primary text-white d-flex align-items-center" style="background: linear-gradient(90deg, #00897b 0%, #43cea2 100%);">
+      <i class="fa fa-user-circle fa-2x me-2"></i>
+      <span class="fs-5">Bienvenido, {{ user_name }} (Usuario CESFAM)</span>
+    </div>
+    <div class="card-body">
+      <h5 class="mb-3 text-primary"><i class="fa fa-id-card me-2"></i>Tus datos</h5>
+      <ul class="list-group mb-4 shadow-sm">
+        <li class="list-group-item"><b>Nombre:</b> {{ usuario.nombre }} {{ usuario.apellido }}</li>
+        <li class="list-group-item"><b>RUN:</b> {{ usuario.run }}</li>
+        <li class="list-group-item"><b>Email:</b> {{ usuario.email }}</li>
+        <li class="list-group-item"><b>Teléfono:</b> {{ usuario.telefono }}</li>
+      </ul>
+      <div class="row mb-4">
+        <div class="col-md-4 mb-2">
+          <div class="card text-center border-info shadow-sm fade-in">
+            <div class="card-body">
+              <div class="fs-2 text-info"><i class="fa fa-file-medical"></i></div>
+              <div class="fw-bold">Historial Médico</div>
+              <a href="/historial_medico/" class="btn btn-info btn-sm mt-2"><i class="fa fa-notes-medical"></i> Ver Historial</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-2">
+          <div class="card text-center border-success shadow-sm fade-in">
+            <div class="card-body">
+              <div class="fs-2 text-success"><i class="fa fa-calendar-plus"></i></div>
+              <div class="fw-bold">Agendar Cita</div>
+              <a href="/cita/" class="btn btn-success btn-sm mt-2"><i class="fa fa-calendar-check"></i> Nueva Cita</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-2">
+          <div class="card text-center border-secondary shadow-sm fade-in">
+            <div class="card-body">
+              <div class="fs-2 text-secondary"><i class="fa fa-comments"></i></div>
+              <div class="fw-bold">Feedback y Sugerencias</div>
+              <a href="/feedback/" class="btn btn-secondary btn-sm mt-2"><i class="fa fa-comment-dots"></i> Ver Feedback</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end mt-3">
+        <a href="/ayuda/" class="btn btn-outline-info me-2"><i class="fa fa-question-circle"></i> Ayuda</a>
+        <a href="/logout/" class="btn btn-outline-danger"><i class="fa fa-sign-out-alt"></i> Cerrar sesión</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

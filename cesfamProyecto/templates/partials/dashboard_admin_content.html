@@ -1,0 +1,57 @@
+<div class="row g-4">
+    <!-- Métricas Principales -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <i class="fas fa-hospital fa-3x text-success mb-2"></i>
+                <h3 class="fw-bold mb-0">{{ resumen.total_cesfams }}</h3>
+                <p class="text-muted mb-0">CESFAMs Registrados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <i class="fas fa-user-md fa-3x text-primary mb-2"></i>
+                <h3 class="fw-bold mb-0">{{ resumen.total_profesionales }}</h3>
+                <p class="text-muted mb-0">Profesionales Activos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <i class="fas fa-users fa-3x text-info mb-2"></i>
+                <h3 class="fw-bold mb-0">{{ resumen.total_usuarios }}</h3>
+                <p class="text-muted mb-0">Pacientes Registrados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <i class="fas fa-calendar-check fa-3x text-warning mb-2"></i>
+                <h3 class="fw-bold mb-0">{{ resumen.total_citas|default:0 }}</h3>
+                <p class="text-muted mb-0">Citas Totales</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones de Administración -->
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-white border-bottom-0 py-3">
+        <h5 class="section-title mb-0"><i class="fas fa-cogs text-secondary me-2"></i>Gestión del Sistema</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Accede al panel de administración de Django para una gestión detallada de los datos del sistema.</p>
+        <div class="list-group">
+            <a href="{% url 'admin:cesfamApp_customuser_changelist' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-users-cog fa-fw me-2"></i>Gestionar todos los Usuarios</a>
+            <a href="{% url 'admin:cesfamApp_cita_changelist' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-calendar-alt fa-fw me-2"></i>Gestionar Citas</a>
+            <a href="{% url 'admin:cesfamApp_servicio_changelist' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-notes-medical fa-fw me-2"></i>Gestionar Servicios</a>
+            <a href="{% url 'admin:cesfamApp_horario_changelist' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-clock fa-fw me-2"></i>Gestionar Horarios</a>
+            <a href="{% url 'admin:cesfamApp_anuncio_changelist' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-bullhorn fa-fw me-2"></i>Gestionar Anuncios</a>
+             <a href="{% url 'admin:index' %}" class="list-group-item list-group-item-dark mt-2"><i class="fas fa-tools fa-fw me-2"></i>Ir al Admin Completo</a>
+        </div>
+    </div>
+</div>

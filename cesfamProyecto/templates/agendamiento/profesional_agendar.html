@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}Agendar Cita para Paciente - {{ block.super }}{% endblock %}
+
+{% block content %}
+<style>
+    .fc-event {
+        cursor: pointer;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 16px rgba(13,110,253,0.10);
+        transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+        font-weight: 600;
+        font-size: 1.05rem;
+        border: none !important;
+        margin-bottom: 4px;
+        background: linear-gradient(90deg, #198754 80%, #0dcaf0 100%) !important;
+        color: #fff !important;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 !important;
+    }
+    .fc-event-main {
+        padding: 10px 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .fc-event.selected, .fc-event:active {
+        background: linear-gradient(90deg, #fd7e14 80%, #ffc107 100%) !important;
+        color: #fff !important;
+        border: 2px solid #fd7e14 !important;
+        box-shadow: 0 6px 24px rgba(253,126,20,0.18);
+    }
+    .fc-event:hover {
+        box-shadow: 0 8px 32px rgba(13,110,253,0.18);
+        transform: scale(1.05);
+        background: linear-gradient(90deg, #0d6efd 80%, #0dcaf0 100%) !important;
+    }
+    .fc .fc-toolbar-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0d6efd;
+    }
+    #selected-slot {
+        background: linear-gradient(90deg, #e9f5ff 80%, #cfe2ff 100%);
+        border-left: 5px solid #0d6efd;
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        color: #0d6efd;
+        box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+    }
+    .card-header.bg-primary {
+        background: linear-gradient(90deg, #0d6efd 60%, #0dcaf0 100%);
+        box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+    }
+    .btn-success.btn-lg {
+        font-size: 1.2rem;
+        padding: 12px 0;
+        border-radius: 10px;
+    }
+    .btn-secondary {
+        border-radius: 10px;
+    }
+    .form-label strong {
+        color: #0d6efd;
+    }
+    .select2-container--default .select2-selection--single {
+        border-radius: 10px;
+        height: 46px;
+        font-size: 1rem;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 46px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 46px;
+    }
+    .calendar-area {
+        background: #f8f9fa;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        padding: 24px 18px 18px 18px;
+        margin-top: 10px;
+    }
+    .fc .fc-daygrid-day-number {
+        font-weight: 600;
+        color: #0d6efd;
+    }
+    .fc .fc-button-primary {
+        background: #0d6efd;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    .fc .fc-button-primary:not(:disabled):active, .fc .fc-button-primary:focus {
+        background: #0dcaf0;
+        color: #fff;
+    }
+</style>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Agendar Cita para Paciente</h3>
+                </div>
+                <div class="card-body">
+                    {% include 'partials/messages.html' %}
+                    <form method="POST" action="{% url 'profesional_crear_cita' %}" id="agendar-form">
+                        {% csrf_token %}
+                        <div class="row">
+                            <!-- Columna de Formulario -->
+                            <div class="col-md-5">
+                                <h5 class="mb-3">Detalles de la Cita</h5>
+                                <hr>
+                                <!-- Selección de Paciente -->
+                                <div class="mb-3">
+                                    <label for="paciente_id" class="form-label"><strong>1. Seleccionar Paciente</strong></label>
+                                    <select class="form-select" id="paciente_id" name="paciente_id" required>
+                                        <option value="" selected disabled>-- Elige un paciente --</option>
+                                        {% for paciente in pacientes %}
+                                            <option value="{{ paciente.id }}">{{ paciente.get_full_name }} ({{ paciente.run|default:'Sin RUN' }})</option>
+                                        {% empty %}
+                                            <option value="" disabled>No hay pacientes registrados.</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <!-- Selección de Servicio -->
+                                <div class="mb-3">
+                                    <label for="servicio_id" class="form-label"><strong>2. Seleccionar Servicio</strong></label>
+                                    <select class="form-select" id="servicio_id" name="servicio_id" required>
+                                        <option value="" selected disabled>-- Elige un servicio --</option>
+                                        {% for servicio in servicios %}
+                                            <option value="{{ servicio.id }}">{{ servicio.nombre }}</option>
+                                        {% empty %}
+                                            <option value="" disabled>No hay servicios disponibles.</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <!-- Horario Seleccionado -->
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>3. Horario Seleccionado</strong></label>
+                                    <div id="selected-slot" class="p-3 rounded">
+                                        <p id="slot-text" class="text-muted mb-0">Aún no has seleccionado un horario.</p>
+                                    </div>
+                                    <input type="hidden" id="fecha_hora_cita" name="fecha_hora_cita" required>
+                                </div>
+                                <hr>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" id="submit-button" class="btn btn-success btn-lg" disabled>
+                                        <i class="fas fa-check-circle me-2"></i>Confirmar y Agendar Cita
+                                    </button>
+                                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Columna de Calendario -->
+                            <div class="col-md-7">
+                                <div class="calendar-area">
+                                    <h5 class="text-center mb-3"><i class="fas fa-calendar-alt me-2"></i>Selecciona un bloque disponible en el calendario (semana, día o mes)</h5>
+                                    <div id='calendar-container'>
+                                        <div id='calendar'></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar Select2
+    $('#paciente_id, #servicio_id').select2({
+        placeholder: "-- Elige una opción --",
+        allowClear: true,
+        width: '100%',
+        dropdownParent: $('#agendar-form')
+    });
+
+    var calendarEl = document.getElementById('calendar');
+    var fechaCitaInput = document.getElementById('fecha_hora_cita');
+    var slotText = document.getElementById('slot-text');
+    var submitButton = document.getElementById('submit-button');
+    var lastClickedEvent = null;
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        locale: 'es',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        slotMinTime: '08:00:00',
+        slotMaxTime: '20:00:00',
+        allDaySlot: false,
+        expandRows: true,
+        events: {
+            url: "{% url 'profesional_horarios_json' %}",
+            failure: function() {
+                alert('Hubo un error al cargar los horarios disponibles.');
+            }
+        },
+        eventDidMount: function(info) {
+            info.el.style.background = 'linear-gradient(90deg, #198754 80%, #0dcaf0 100%)';
+            info.el.style.borderColor = '#146c43';
+            info.el.style.fontWeight = 'bold';
+            info.el.style.fontSize = '1.05rem';
+            info.el.innerHTML = `<span class='badge bg-success me-2'><i class='fas fa-clock'></i></span> ${info.event.title}`;
+        },
+        eventClick: function(info) {
+            var selectedDateTime = info.event.start;
+            var formattedDate = selectedDateTime.toLocaleString('es-ES', {
+                dateStyle: 'full', timeStyle: 'short'
+            });
+            slotText.textContent = `Horario seleccionado: ${formattedDate}`;
+            slotText.classList.remove('text-muted');
+            fechaCitaInput.value = selectedDateTime.toISOString();
+            if(lastClickedEvent) {
+                lastClickedEvent.setProp('background', 'linear-gradient(90deg, #198754 80%, #0dcaf0 100%)');
+                lastClickedEvent.setProp('classNames', []);
+            }
+            info.event.setProp('background', 'linear-gradient(90deg, #fd7e14 80%, #ffc107 100%)');
+            info.event.setProp('classNames', ['selected']);
+            lastClickedEvent = info.event;
+            submitButton.disabled = false;
+        },
+        eventMouseEnter: function(info) {
+            info.el.style.cursor = 'pointer';
+        }
+    });
+    calendar.render();
+});
+</script>
+{% endblock %}

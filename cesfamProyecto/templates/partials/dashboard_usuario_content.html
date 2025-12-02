@@ -1,0 +1,102 @@
+<div class="row g-4">
+    <!-- Columna Izquierda: Citas -->
+    <div class="col-lg-8">
+        <!-- Próximas Citas -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white border-bottom-0 py-3">
+                <h5 class="section-title mb-0"><i class="fas fa-calendar-check text-success me-2"></i>Próximas Citas</h5>
+            </div>
+            <div class="card-body">
+                {% if proximas_citas %}
+                    <ul class="list-group list-group-flush">
+                        {% for cita in proximas_citas %}
+                            <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center p-3">
+                                <div>
+                                    <p class="fw-bold mb-1">{{ cita.fecha_hora|date:"l, d \d\e F, H:i" }} hrs.</p>
+                                    <p class="mb-0 text-muted"><i class="fas fa-notes-medical me-2"></i>{{ cita.servicio.nombre }} con <span class="fw-bold">{{ cita.profesional.get_full_name }}</span></p>
+                                </div>
+                                <form method="post" action="{% url 'cancelar_cita' %}" onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta cita?');" class="mt-2 mt-md-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id_cita" value="{{ cita.id }}">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fas fa-times me-1"></i>Cancelar</button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="alert alert-light text-center border-0" role="alert">
+                        <i class="fas fa-calendar-alt fa-2x mb-2 text-muted"></i>
+                        <p class="mb-0">No tienes próximas citas agendadas.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Historial de Citas -->
+        <div class="card shadow-sm">
+             <div class="card-header bg-white border-bottom-0 py-3">
+                <h5 class="section-title mb-0"><i class="fas fa-history text-secondary me-2"></i>Historial de Citas</h5>
+            </div>
+            <div class="card-body">
+                {% if historial_citas %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Servicio</th>
+                                    <th>Profesional</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cita in historial_citas %}
+                                    <tr>
+                                        <td>{{ cita.fecha_hora|date:"d/m/Y" }}</td>
+                                        <td>{{ cita.servicio.nombre }}</td>
+                                        <td>{{ cita.profesional.get_full_name }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                     <div class="alert alert-light text-center border-0" role="alert">
+                        <p class="mb-0">No hay citas anteriores en tu historial.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Columna Derecha: Información y Acciones -->
+    <div class="col-lg-4">
+        <!-- Información del Usuario -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white border-bottom-0 py-3">
+                 <h5 class="section-title mb-0"><i class="fas fa-user-circle text-primary me-2"></i>Tu Información</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><strong>Nombre:</strong><br>{{ user.get_full_name }}</li>
+                    <li class="mb-2"><strong>RUN:</strong><br>{{ user.run|default:"No especificado" }}</li>
+                    <li class="mb-2"><strong>Email:</strong><br>{{ user.email }}</li>
+                    <li><strong>Teléfono:</strong><br>{{ user.telefono|default:"No especificado" }}</li>
+                </ul>
+                <hr>
+                <a href="#" class="btn btn-outline-secondary btn-sm"><i class="fas fa-edit me-1"></i>Editar Perfil</a>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="card shadow-sm">
+             <div class="card-header bg-white border-bottom-0 py-3">
+                <h5 class="section-title mb-0"><i class="fas fa-bolt text-warning me-2"></i>Acciones Rápidas</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'agendar_cita_paso1' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-calendar-plus fa-fw me-2 text-success"></i>Agendar Nueva Cita</a>
+                <a href="{% url 'historial_medico' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-file-medical fa-fw me-2 text-info"></i>Ver Historial Médico</a>
+                <a href="{% url 'feedback' %}" class="list-group-item list-group-item-action p-3"><i class="fas fa-comment-dots fa-fw me-2 text-secondary"></i>Enviar Feedback</a>
+            </div>
+        </div>
+    </div>
+</div>

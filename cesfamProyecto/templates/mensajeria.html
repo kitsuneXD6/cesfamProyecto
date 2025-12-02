@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Mensajería Interna</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">Conversaciones</div>
+                <ul class="list-group list-group-flush" id="conversation-list">
+                    <!-- Conversaciones se cargarán aquí -->
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-header bg-info text-white">Iniciar nueva conversación</div>
+                <select class="form-select" id="user-select">
+                    <option value="">Selecciona un usuario...</option>
+                </select>
+                <button class="btn btn-success m-2" id="start-conv-btn">Iniciar</button>
+                <div id="conv-error" class="text-danger mt-2"></div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white" id="chat-header">Mensajes</div>
+                <div class="card-body overflow-auto" id="message-list" style="height: 350px;">
+                    <!-- Mensajes se cargarán aquí -->
+                </div>
+                <div class="card-footer">
+                    <form id="message-form" class="d-flex">
+                        <input type="text" class="form-control me-2" id="message-input" placeholder="Escribe un mensaje..." autocomplete="off">
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+const currentUserId = Number('{{ current_user_id }}');
+const conversationList = document.getElementById('conversation-list');
+const messageList = document.getElementById('message-list');
+const messageForm = document.getElementById('message-form');
+const messageInput = document.getElementById('message-input');
+const chatHeader = document.getElementById('chat-header');
+const userSelect = document.getElementById('user-select');
+const startConvBtn = document.getElementById('start-conv-btn');
+const convError = document.getElementById('conv-error');
+let currentConversationId = null;
+let usersCache = [];
+let conversationsCache = [];
+
+function getOtherParticipant(conv) {
+    if (!conv.participants || conv.participants.length < 2) return null;
+    return conv.participants.find(u => u.id !== currentUserId);
+}
+
+function getOtherParticipantName(conv) {
+    const other = getOtherParticipant(conv);
+    if (other) return `${other.first_name || other.username} (${other.rol})`;
+    return `Conversación #${conv.id}`;
+}
+
+function loadConversations() {
+    fetch('/api/conversations/')
+        .then(res => res.json())
+        .then(data => {
+            conversationsCache = data;
+            conversationList.innerHTML = '';
+            data.forEach(conv => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item list-group-item-action';
+                li.textContent = getOtherParticipantName(conv);
+                li.onclick = () => selectConversation(conv.id);
+                conversationList.appendChild(li);
+            });
+        });
+}
+
+function selectConversation(id) {
+    currentConversationId = id;
+    const conv = conversationsCache.find(c => c.id === id);
+    chatHeader.textContent = conv ? getOtherParticipantName(conv) : `Conversación #${id}`;
+    loadMessages(id);
+}
+
+function loadMessages(conversationId) {
+    fetch(`/api/conversations/${conversationId}/messages/`)
+        .then(res => res.json())
+        .then(data => {
+            messageList.innerHTML = '';
+            if (!data.length) {
+                messageList.innerHTML = '<div class="text-muted">No hay mensajes en esta conversación.</div>';
+                return;
+            }
+            data.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'mb-2';
+                div.innerHTML = `<strong>${msg.sender?.first_name || msg.sender?.username || msg.sender}:</strong> ${msg.content} <span class="text-muted small">${msg.timestamp?.slice(0,16).replace('T',' ') || ''}</span>`;
+                messageList.appendChild(div);
+            });
+            messageList.scrollTop = messageList.scrollHeight;
+        });
+}
+
+messageForm.onsubmit = function(e) {
+    e.preventDefault();
+    if (!currentConversationId || !messageInput.value.trim()) return;
+    fetch(`/api/conversations/${currentConversationId}/messages/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ content: messageInput.value, sender_id: currentUserId })
+    })
+    .then(res => res.json())
+    .then(() => {
+        messageInput.value = '';
+        loadMessages(currentConversationId);
+    });
+};
+
+function loadUsers() {
+    fetch('/api/users/')
+        .then(res => res.json())
+        .then(data => {
+            usersCache = data;
+            userSelect.innerHTML = '<option value="">Selecciona un usuario...</option>';
+            data.forEach(user => {
+                if (!user.is_staff && user.id !== currentUserId)
+                    userSelect.innerHTML += `<option value="${user.id}">${user.first_name || user.username} (${user.rol})</option>`;
+            });
+        });
+}
+
+startConvBtn.onclick = function() {
+    const userId = userSelect.value;
+    convError.textContent = '';
+    if (!userId || !currentUserId) {
+        convError.textContent = 'Selecciona un usuario válido.';
+        return;
+    }
+    fetch('/api/conversations/')
+        .then(res => res.json())
+        .then(convs => {
+            let found = convs.find(conv => conv.participants && conv.participants.length === 2 && conv.participants.some(u => u.id === parseInt(userId)) && conv.participants.some(u => u.id === currentUserId));
+            let title = null;
+            if (usersCache.length) {
+                const other = usersCache.find(u => u.id === parseInt(userId));
+                title = other ? `${other.first_name || other.username} (${other.rol})` : null;
+            }
+            if (found) {
+                selectConversation(found.id);
+            } else {
+                fetch('/api/conversations/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ participants_ids: [currentUserId, parseInt(userId)] })
+                })
+                .then(res => res.json())
+                .then(newConv => {
+                    if (newConv.id) {
+                        loadConversations();
+                        selectConversation(newConv.id);
+                    } else {
+                        convError.textContent = 'No se pudo crear la conversación. Revisa permisos o intenta de nuevo.';
+                    }
+                })
+                .catch(() => {
+                    convError.textContent = 'Error al crear la conversación.';
+                });
+            }
+        });
+};
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+loadUsers();
+loadConversations();
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Gestionar Profesionales | CESFAM{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4"><i class="fa fa-user-md text-success me-2"></i> Gestión de Profesionales</h2>
+  <form method="post" class="card p-3 mb-4 shadow-sm">
+    {% csrf_token %}
+    <div class="row g-2">
+      <div class="col"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+      <div class="col"><input type="text" name="especialidad" class="form-control" placeholder="Especialidad" required></div>
+      <div class="col"><input type="email" name="email" class="form-control" placeholder="Email" required></div>
+      <div class="col"><input type="password" name="password" class="form-control" placeholder="Contraseña" required></div>
+      <div class="col-auto"><label><input type="checkbox" name="es_admin"> Admin</label></div>
+      <div class="col-auto"><button type="submit" name="crear" class="btn btn-success"><i class="fa fa-plus"></i> Crear</button></div>
+    </div>
+  </form>
+  <h4>Profesionales Registrados</h4>
+  <ul class="list-group mb-4">
+    {% for p in profesionales %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <b>{{ p.nombre }}</b> ({{ p.especialidad }})<br>
+          <span class="text-muted small">{{ p.email }}</span>
+          {% if p.es_admin %}<span class="badge bg-warning text-dark ms-2">Admin</span>{% endif %}
+        </div>
+        <form method="post" class="d-flex gap-2 align-items-center" style="margin:0;">
+          {% csrf_token %}
+          <input type="hidden" name="id_profesional" value="{{ p.id_profesional }}">
+          <input type="password" name="nuevo_password" class="form-control form-control-sm" placeholder="Nueva contraseña">
+          <button type="submit" name="reset_password" class="btn btn-warning btn-sm"><i class="fa fa-key"></i></button>
+          <button type="submit" name="asignar_admin" class="btn btn-info btn-sm"><i class="fa fa-user-shield"></i></button>
+          <button type="submit" name="eliminar" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+        </form>
+      </li>
+    {% empty %}
+      <li class="list-group-item">No hay profesionales registrados.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

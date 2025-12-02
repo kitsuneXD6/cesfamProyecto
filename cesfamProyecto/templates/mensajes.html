@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Mensajes | CESFAM{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4"><i class="fa fa-comments text-primary me-2"></i> Mensajería Interna</h2>
+  <form method="get" class="mb-3">
+    <div class="row g-2 align-items-end">
+      <div class="col-auto">
+        <label for="destinatario" class="form-label">Conversar con:</label>
+      </div>
+      <div class="col-auto">
+        <select name="destinatario" id="destinatario" class="form-select" onchange="this.form.submit()">
+          <option value="">Selecciona...</option>
+          {% for d in destinatarios %}
+            <option value="{{ d.id_profesional|default:d.id_usuario }}" {% if selected_id == d.id_profesional|stringformat:'s' or selected_id == d.id_usuario|stringformat:'s' %}selected{% endif %}>
+              {{ d.nombre }} {% if d.apellido %}{{ d.apellido }}{% endif %}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </form>
+  {% if selected_id %}
+    <div class="card mb-3">
+      <div class="card-body" style="max-height: 350px; overflow-y: auto;">
+        {% for m in mensajes %}
+          <div class="mb-2">
+            <span class="fw-bold">{% if m.remitente_usuario %}Usuario{% else %}Profesional{% endif %}:</span>
+            <span>{{ m.contenido }}</span>
+            <span class="text-muted small float-end">{{ m.fecha|date:'d/m/Y H:i' }}</span>
+          </div>
+        {% empty %}
+          <div class="alert alert-info">No hay mensajes aún.</div>
+        {% endfor %}
+      </div>
+      <form method="post" class="card-footer d-flex gap-2">
+        {% csrf_token %}
+        <input type="text" name="contenido" class="form-control" placeholder="Escribe un mensaje..." required>
+        <button class="btn btn-primary"><i class="fa fa-paper-plane"></i> Enviar</button>
+      </form>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

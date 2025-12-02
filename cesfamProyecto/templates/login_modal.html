@@ -1,0 +1,87 @@
+<!-- Modal de login -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="/login/" autocomplete="off">
+        {% csrf_token %}
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Iniciar Sesión</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2">
+            <input type="text" name="identificador" class="form-control" placeholder="RUN o Email" required>
+          </div>
+          <div class="mb-2">
+            <input type="password" name="password" class="form-control" placeholder="Contraseña" required autocomplete="current-password">
+          </div>
+        </div>
+        <div class="modal-footer d-flex flex-column gap-2">
+          <button class="btn btn-primary w-100">Ingresar</button>
+          <button type="button" class="btn btn-link w-100" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal">¿No tienes cuenta? Regístrate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Modal de registro con pestañas para usuario y profesional -->
+<div class="modal fade" id="registerModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <ul class="nav nav-tabs" id="registerTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="user-tab" data-bs-toggle="tab" data-bs-target="#user-register" type="button" role="tab">Usuario</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="prof-tab" data-bs-toggle="tab" data-bs-target="#prof-register" type="button" role="tab">Profesional</button>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <!-- Registro Usuario -->
+        <div class="tab-pane fade show active" id="user-register" role="tabpanel">
+          <form method="post" action="/register/" autocomplete="off">
+            {% csrf_token %}
+            <input type="hidden" name="tipo_registro" value="usuario">
+            <div class="modal-header bg-success text-white">
+              <h5 class="modal-title">Crear cuenta de usuario</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-2"><input type="text" name="run" class="form-control" placeholder="RUN" required></div>
+              <div class="mb-2"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+              <div class="mb-2"><input type="text" name="apellido" class="form-control" placeholder="Apellido" required></div>
+              <div class="mb-2"><input type="email" name="email" class="form-control" placeholder="Email" required></div>
+              <div class="mb-2"><input type="number" name="telefono" class="form-control" placeholder="Teléfono" required></div>
+              <div class="mb-2"><input type="password" name="password" class="form-control" placeholder="Contraseña" required autocomplete="current-password"></div>
+            </div>
+            <div class="modal-footer d-flex flex-column gap-2">
+              <button class="btn btn-success w-100">Registrarse</button>
+              <button type="button" class="btn btn-link w-100" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal">¿Ya tienes cuenta? Inicia sesión</button>
+            </div>
+          </form>
+        </div>
+        <!-- Registro Profesional -->
+        <div class="tab-pane fade" id="prof-register" role="tabpanel">
+          <form method="post" action="/register/" autocomplete="off">
+            {% csrf_token %}
+            <input type="hidden" name="tipo_registro" value="profesional">
+            <div class="modal-header bg-primary text-white">
+              <h5 class="modal-title">Crear cuenta de profesional</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-2"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+              <div class="mb-2"><input type="text" name="especialidad" class="form-control" placeholder="Especialidad" required></div>
+              <div class="mb-2"><input type="email" name="email" class="form-control" placeholder="Email" required></div>
+              <div class="mb-2"><input type="password" name="password" class="form-control" placeholder="Contraseña" required autocomplete="current-password"></div>
+            </div>
+            <div class="modal-footer d-flex flex-column gap-2">
+              <button class="btn btn-primary w-100">Registrarse</button>
+              <button type="button" class="btn btn-link w-100" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal">¿Ya tienes cuenta? Inicia sesión</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

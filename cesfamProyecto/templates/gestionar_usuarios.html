@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Gestionar Usuarios | CESFAM{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4"><i class="fa fa-users text-primary me-2"></i> Gestión de Usuarios</h2>
+  <form method="post" class="card p-3 mb-4 shadow-sm">
+    {% csrf_token %}
+    <div class="row g-2">
+      <div class="col"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+      <div class="col"><input type="text" name="apellido" class="form-control" placeholder="Apellido" required></div>
+      <div class="col"><input type="text" name="run" class="form-control" placeholder="RUN" required></div>
+      <div class="col"><input type="email" name="email" class="form-control" placeholder="Email" required></div>
+      <div class="col"><input type="text" name="telefono" class="form-control" placeholder="Teléfono" required></div>
+      <div class="col"><input type="password" name="password" class="form-control" placeholder="Contraseña" required></div>
+      <div class="col-auto"><button type="submit" name="crear" class="btn btn-success"><i class="fa fa-plus"></i> Crear</button></div>
+    </div>
+  </form>
+  <h4>Usuarios Registrados</h4>
+  <ul class="list-group mb-4">
+    {% for u in usuarios %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <b>{{ u.nombre }} {{ u.apellido }}</b> ({{ u.run }})<br>
+          <span class="text-muted small">{{ u.email }} | {{ u.telefono }}</span>
+        </div>
+        <form method="post" class="d-flex gap-2 align-items-center" style="margin:0;">
+          {% csrf_token %}
+          <input type="hidden" name="id_usuario" value="{{ u.id_usuario }}">
+          <input type="password" name="nuevo_password" class="form-control form-control-sm" placeholder="Nueva contraseña">
+          <button type="submit" name="reset_password" class="btn btn-warning btn-sm"><i class="fa fa-key"></i></button>
+          <button type="submit" name="eliminar" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+        </form>
+      </li>
+    {% empty %}
+      <li class="list-group-item">No hay usuarios registrados.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

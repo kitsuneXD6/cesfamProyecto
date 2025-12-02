@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Métricas | CESFAM{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4"><i class="fa fa-chart-bar text-warning me-2"></i> Dashboard de Métricas</h2>
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-gradient-dark text-white">Citas por Día (últimos 7 días)</div>
+        <ul class="list-group list-group-flush">
+          {% for d in citas_dia %}
+            <li class="list-group-item">{{ d.dia|date:'d/m/Y' }}: <b>{{ d.total }}</b></li>
+          {% empty %}
+            <li class="list-group-item">Sin datos</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-gradient-dark text-white">Citas por Semana (últimas 4 semanas)</div>
+        <ul class="list-group list-group-flush">
+          {% for s in citas_semana %}
+            <li class="list-group-item">Semana {{ s.semana|date:'W/Y' }}: <b>{{ s.total }}</b></li>
+          {% empty %}
+            <li class="list-group-item">Sin datos</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-gradient-dark text-white">Citas por Mes (últimos 6 meses)</div>
+        <ul class="list-group list-group-flush">
+          {% for m in citas_mes %}
+            <li class="list-group-item">{{ m.mes|date:'m/Y' }}: <b>{{ m.total }}</b></li>
+          {% empty %}
+            <li class="list-group-item">Sin datos</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-gradient-dark text-white">Carga de Trabajo por Profesional</div>
+        <ul class="list-group list-group-flush">
+          {% for p in carga_profesionales %}
+            <li class="list-group-item">{{ p.id_profesional__nombre }}: <b>{{ p.total }}</b> citas</li>
+          {% empty %}
+            <li class="list-group-item">Sin datos</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-gradient-dark text-white">Total de Citas</div>
+        <div class="card-body display-6 text-center">{{ total_citas }}</div>
+      </div>
+    </div>
+  </div>
+  <a href="/dashboard" class="btn btn-gradient-dark mt-3"><i class="fa fa-arrow-left"></i> Volver al panel</a>
+</div>
+{% endblock %}

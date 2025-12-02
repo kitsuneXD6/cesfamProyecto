@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Inicio | CESFAM{% endblock %}
+{% block navbar %}{% include "navbar.html" %}{% endblock %}
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 70vh; background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);">
+    <div class="text-center mb-4 fade-in">
+        <img src="https://cdn-icons-png.flaticon.com/512/2966/2966484.png" alt="CESFAM" style="height:90px; filter: drop-shadow(0 2px 8px #1e90ff33);">
+        <h1 class="mt-3 fw-bold" style="color:#00897b; text-shadow: 0 2px 8px #00c6ff22;">Bienvenido a la Plataforma CESFAM</h1>
+        <p class="lead">Gestión de salud moderna y segura</p>
+    </div>
+    <div class="d-flex gap-3 mb-4 fade-in" style="animation-delay:0.2s;animation-fill-mode:both;">
+        <a href="/login/" class="btn btn-primary btn-lg shadow"><i class="fa fa-sign-in-alt"></i> Iniciar sesión</a>
+        <a href="/register/" class="btn btn-success btn-lg shadow"><i class="fa fa-user-plus"></i> Registrarse</a>
+        <a href="#faq" class="btn btn-outline-info btn-lg shadow"><i class="fa fa-question-circle"></i> Preguntas frecuentes</a>
+    </div>
+    <div class="row w-100 justify-content-center fade-in" style="animation-delay:0.4s;animation-fill-mode:both;">
+        <div class="col-md-6 col-lg-5 mb-3">
+            <div class="card shadow-lg border-0 bg-white rounded-4">
+                <div class="card-body">
+                    <h4 class="card-title" style="color:#00897b;"><i class="fa fa-heartbeat me-2"></i>¿Qué es CESFAM?</h4>
+                    <ul class="mb-2">
+                        <li>Acceso rápido a tus datos de salud y servicios.</li>
+                        <li>Gestión eficiente de profesionales y usuarios.</li>
+                        <li>Plataforma segura y fácil de usar.</li>
+                        <li>Soporte y atención personalizada.</li>
+                    </ul>
+                    <p class="fst-italic text-secondary">“Cuidando tu salud, cerca de ti.”</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-5 mb-3">
+            <div class="card shadow-lg border-0 bg-white rounded-4" id="faq">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fa fa-info-circle me-2"></i>Preguntas frecuentes</h5>
+                    <h6 class="fw-bold mt-3 mb-2 text-success">Para usuarios</h6>
+                    <div class="accordion mb-3" id="faqAccordionUsuarios">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqU1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseU1">¿Cómo me registro en la plataforma?</button>
+                            </h2>
+                            <div id="collapseU1" class="accordion-collapse collapse" data-bs-parent="#faqAccordionUsuarios">
+                                <div class="accordion-body">Haz clic en <b>Registrarse</b> y completa el formulario con tus datos personales. Accederás de inmediato tras el registro.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqU2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseU2">¿Cómo inicio sesión?</button>
+                            </h2>
+                            <div id="collapseU2" class="accordion-collapse collapse" data-bs-parent="#faqAccordionUsuarios">
+                                <div class="accordion-body">Haz clic en <b>Iniciar sesión</b> e ingresa tu RUN o correo y tu contraseña.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqU3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseU3">¿Qué hago si olvidé mi contraseña?</button>
+                            </h2>
+                            <div id="collapseU3" class="accordion-collapse collapse" data-bs-parent="#faqAccordionUsuarios">
+                                <div class="accordion-body">Por ahora, contacta a soporte a <a href="mailto:contacto@cesfam.cl">contacto@cesfam.cl</a> para recuperar tu acceso.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqU4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseU4">¿Qué servicios puedo ver?</button>
+                            </h2>
+                            <div id="collapseU4" class="accordion-collapse collapse" data-bs-parent="#faqAccordionUsuarios">
+                                <div class="accordion-body">Podrás ver todos los servicios de salud disponibles en tu CESFAM y tus datos personales.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqU5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseU5">¿Cómo actualizo mis datos?</button>
+                            </h2>
+                            <div id="collapseU5" class="accordion-collapse collapse" data-bs-parent="#faqAccordionUsuarios">
+                                <div class="accordion-body">Pronto podrás editar tus datos desde tu panel. Por ahora, contacta a soporte para cambios importantes.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <h6 class="fw-bold mt-4 mb-2 text-primary">Para profesionales</h6>
+                    <div class="accordion" id="faqAccordionProfesionales">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqP1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseP1">¿Cómo me registro como profesional?</button>
+                            </h2>
+                            <div id="collapseP1" class="accordion-collapse collapse" data-bs-parent="#faqAccordionProfesionales">
+                                <div class="accordion-body">Selecciona la pestaña <b>Profesional</b> en el registro y completa tus datos. Accederás a tu panel tras el registro.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqP2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseP2">¿Qué puedo gestionar como profesional?</button>
+                            </h2>
+                            <div id="collapseP2" class="accordion-collapse collapse" data-bs-parent="#faqAccordionProfesionales">
+                                <div class="accordion-body">Podrás gestionar usuarios, servicios y otros profesionales desde el panel de administración.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqP3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseP3">¿Cómo contacto a soporte?</button>
+                            </h2>
+                            <div id="collapseP3" class="accordion-collapse collapse" data-bs-parent="#faqAccordionProfesionales">
+                                <div class="accordion-body">Puedes escribirnos a <a href="mailto:contacto@cesfam.cl">contacto@cesfam.cl</a> para cualquier consulta o problema.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_head %}
+<style>
+.fade-in { opacity:0; animation: fadeInDown 0.8s forwards; }
+.fade-in[style*="animation-delay:0.2s"] { animation-delay:0.2s; }
+.fade-in[style*="animation-delay:0.4s"] { animation-delay:0.4s; }
+@media (max-width: 768px) {
+    .d-flex.gap-3 { flex-direction: column !important; gap: 1rem !important; }
+}
+</style>
+{% endblock %}

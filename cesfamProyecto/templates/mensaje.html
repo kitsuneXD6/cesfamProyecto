@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Mensajes | CESFAM{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-header d-flex align-items-center" style="background: linear-gradient(90deg, #00897b 0%, #43cea2 100%);">
+      <i class="fa fa-envelope fa-lg me-2 text-white"></i>
+      <span class="fs-5 text-white">Mensajes recibidos</span>
+    </div>
+    <div class="card-body">
+      {% if mensajes %}
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle shadow-sm">
+          <thead class="table-success">
+            <tr>
+              <th>Fecha</th>
+              <th>Remitente</th>
+              <th>Asunto</th>
+              <th>Mensaje</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for mensaje in mensajes %}
+            <tr>
+              <td>{{ mensaje.fecha|date:'d/m/Y H:i' }}</td>
+              <td>{{ mensaje.remitente.nombre }}</td>
+              <td>{{ mensaje.asunto }}</td>
+              <td>{{ mensaje.contenido }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info"><i class="fa fa-info-circle me-1"></i> No tienes mensajes nuevos.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

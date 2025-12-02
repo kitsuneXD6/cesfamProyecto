@@ -1,0 +1,15 @@
+<div class="mb-4">
+  <h5 class="section-title"><i class="fa fa-bullhorn text-warning me-2"></i> Anuncios</h5>
+  {% if anuncios %}
+    <ul class="list-group mb-2">
+      {% for anuncio in anuncios %}
+        <li class="list-group-item">
+          <strong>{{ anuncio.titulo }}</strong> <span class="text-muted small">({{ anuncio.fecha_publicacion|date:'d/m/Y H:i' }})</span><br>
+          {{ anuncio.contenido }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-info" role="alert">No hay anuncios recientes.</div>
+  {% endif %}
+</div>

@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+{% load static %}
+{% block navbar %}{% include "navbar.html" %}{% endblock %}
+{% block content %}
+<div class="container">
+    {% if messages %}
+    <div class="mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} fade-in" role="alert">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="row mb-4 text-center">
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card dashboard-card shadow-lg border-0" style="background: linear-gradient(135deg, #1e90ff 0%, #00c6ff 100%); color: #fff;">
+                <div class="card-body">
+                    <div class="icono-salud mb-2"><i class="fa-solid fa-hospital fa-2x"></i></div>
+                    <h5 class="card-title">CESFAM</h5>
+                    <p class="display-6 fw-bold">{{ resumen.total_cesfams }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card dashboard-card shadow-lg border-0" style="background: linear-gradient(135deg, #00c6ff 0%, #1e90ff 100%); color: #fff;">
+                <div class="card-body">
+                    <div class="icono-salud mb-2"><i class="fa-solid fa-user-doctor fa-2x"></i></div>
+                    <h5 class="card-title">Profesionales</h5>
+                    <p class="display-6 fw-bold">{{ resumen.total_profesionales }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card dashboard-card shadow-lg border-0" style="background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); color: #fff;">
+                <div class="card-body">
+                    <div class="icono-salud mb-2"><i class="fa-solid fa-stethoscope fa-2x"></i></div>
+                    <h5 class="card-title">Servicios</h5>
+                    <p class="display-6 fw-bold">{{ resumen.total_servicios }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-2">
+            <div class="card dashboard-card shadow-lg border-0" style="background: linear-gradient(135deg, #ff512f 0%, #dd2476 100%); color: #fff;">
+                <div class="card-body">
+                    <div class="icono-salud mb-2"><i class="fa-solid fa-users fa-2x"></i></div>
+                    <h5 class="card-title">Usuarios</h5>
+                    <p class="display-6 fw-bold">{{ resumen.total_usuarios }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="cesfam-tab" data-bs-toggle="tab" data-bs-target="#cesfam" type="button" role="tab">CESFAM</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="profesionales-tab" data-bs-toggle="tab" data-bs-target="#profesionales" type="button" role="tab">Profesionales</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="servicios-tab" data-bs-toggle="tab" data-bs-target="#servicios" type="button" role="tab">Servicios</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab">Usuarios</button>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <!-- TABLA CESFAM -->
+        <div class="tab-pane fade show active" id="cesfam" role="tabpanel">
+            {% if is_admin %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">Agregar CESFAM</div>
+                <div class="card-body">
+                    <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        <input type="hidden" name="add_cesfam" value="1">
+                        <div class="row g-2">
+                            <div class="col-md-4"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+                            <div class="col-md-4"><input type="text" name="direccion" class="form-control" placeholder="Dirección" required></div>
+                            <div class="col-md-4"><input type="number" name="telefono" class="form-control" placeholder="Teléfono" required></div>
+                        </div>
+                        <button class="btn btn-success mt-2">Agregar CESFAM</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Buscar CESFAM..." id="searchCesfam" onkeyup="filterList('cesfam-list', this.value)">
+            </div>
+            <div class="row" id="cesfam-list">
+                {% for cesfam in cesfams %}
+                <div class="col-md-4 cesfam-item">
+                    <div class="card fade-in position-relative">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fa-solid fa-hospital me-2"></i>{{ cesfam.nombre }}</h5>
+                            <p class="card-text"><strong>Dirección:</strong> {{ cesfam.direccion }}</p>
+                            <p class="card-text"><strong>Teléfono:</strong> {{ cesfam.telefono }}</p>
+                            {% if is_admin %}
+                            <div class="admin-actions position-absolute top-0 end-0 m-2">
+                                <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#editCesfamModal{{ cesfam.id_cesfam }}"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCesfamModal{{ cesfam.id_cesfam }}"><i class="fa fa-trash"></i></button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Editar CESFAM -->
+                <div class="modal fade" id="editCesfamModal{{ cesfam.id_cesfam }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        <input type="hidden" name="edit_cesfam" value="{{ cesfam.id_cesfam }}">
+                        <div class="modal-header"><h5 class="modal-title">Editar CESFAM</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">
+                          <div class="mb-2"><input type="text" name="nombre" class="form-control" value="{{ cesfam.nombre }}" required></div>
+                          <div class="mb-2"><input type="text" name="direccion" class="form-control" value="{{ cesfam.direccion }}" required></div>
+                          <div class="mb-2"><input type="number" name="telefono" class="form-control" value="{{ cesfam.telefono }}" required></div>
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-success">Guardar cambios</button></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <!-- Modal Eliminar CESFAM -->
+                <div class="modal fade" id="deleteCesfamModal{{ cesfam.id_cesfam }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_cesfam" value="{{ cesfam.id_cesfam }}">
+                        <div class="modal-header bg-danger text-white"><h5 class="modal-title">Eliminar CESFAM</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">¿Seguro que deseas eliminar el CESFAM <b>{{ cesfam.nombre }}</b>?</div>
+                        <div class="modal-footer"><button class="btn btn-danger">Eliminar</button></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                {% empty %}
+                <p>No hay CESFAM registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- TABLA PROFESIONALES -->
+        <div class="tab-pane fade" id="profesionales" role="tabpanel">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Buscar profesional..." id="searchProfesional" onkeyup="filterList('profesional-list', this.value)">
+            </div>
+            <div class="row" id="profesional-list">
+                {% for profesional in profesionales %}
+                <div class="col-md-4 profesional-item">
+                    <div class="card fade-in position-relative">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fa-solid fa-user-doctor me-2"></i>{{ profesional.nombre }}</h5>
+                            <p class="card-text"><strong>Especialidad:</strong> {{ profesional.especialidad }}</p>
+                            <p class="card-text"><strong>Email:</strong> {{ profesional.email }}</p>
+                            {% if is_admin %}
+                            <div class="admin-actions position-absolute top-0 end-0 m-2">
+                                <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#editProfesionalModal{{ profesional.id_profesional }}"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteProfesionalModal{{ profesional.id_profesional }}"><i class="fa fa-trash"></i></button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Editar Profesional -->
+                <div class="modal fade" id="editProfesionalModal{{ profesional.id_profesional }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        <input type="hidden" name="edit_profesional" value="{{ profesional.id_profesional }}">
+                        <div class="modal-header"><h5 class="modal-title">Editar Profesional</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">
+                          <div class="mb-2"><input type="text" name="nombre" class="form-control" value="{{ profesional.nombre }}" required></div>
+                          <div class="mb-2"><input type="text" name="especialidad" class="form-control" value="{{ profesional.especialidad }}" required></div>
+                          <div class="mb-2"><input type="email" name="email" class="form-control" value="{{ profesional.email }}" required></div>
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-success">Guardar cambios</button></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <!-- Modal Eliminar Profesional -->
+                <div class="modal fade" id="deleteProfesionalModal{{ profesional.id_profesional }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_profesional" value="{{ profesional.id_profesional }}">
+                        <div class="modal-header bg-danger text-white"><h5 class="modal-title">Eliminar Profesional</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">¿Seguro que deseas eliminar a <b>{{ profesional.nombre }}</b>?</div>
+                        <div class="modal-footer"><button class="btn btn-danger">Eliminar</button></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                {% empty %}
+                <p>No hay profesionales registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- TABLA SERVICIOS -->
+        <div class="tab-pane fade" id="servicios" role="tabpanel">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Buscar servicio..." id="searchServicio" onkeyup="filterList('servicio-list', this.value)">
+            </div>
+            <div class="row" id="servicio-list">
+                {% for servicio in servicios %}
+                <div class="col-md-4 servicio-item">
+                    <div class="card fade-in position-relative">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fa-solid fa-stethoscope me-2"></i>{{ servicio.nombre }}</h5>
+                            <p class="card-text"><strong>Tipo:</strong> {{ servicio.tipo }}</p>
+                            <p class="card-text"><strong>Descripción:</strong> {{ servicio.descripcion }}</p>
+                            {% if is_admin %}
+                            <div class="admin-actions position-absolute top-0 end-0 m-2">
+                                <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#editServicioModal{{ servicio.id_servicio }}"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteServicioModal{{ servicio.id_servicio }}"><i class="fa fa-trash"></i></button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Editar Servicio -->
+                <div class="modal fade" id="editServicioModal{{ servicio.id_servicio }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        <input type="hidden" name="edit_servicio" value="{{ servicio.id_servicio }}">
+                        <div class="modal-header"><h5 class="modal-title">Editar Servicio</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">
+                          <div class="mb-2"><input type="text" name="nombre" class="form-control" value="{{ servicio.nombre }}" required></div>
+                          <div class="mb-2"><input type="text" name="tipo" class="form-control" value="{{ servicio.tipo }}" required></div>
+                          <div class="mb-2"><input type="text" name="descripcion" class="form-control" value="{{ servicio.descripcion }}" required></div>
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-success">Guardar cambios</button></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <!-- Modal Eliminar Servicio -->
+                <div class="modal fade" id="deleteServicioModal{{ servicio.id_servicio }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_servicio" value="{{ servicio.id_servicio }}">
+                        <div class="modal-header bg-danger text-white"><h5 class="modal-title">Eliminar Servicio</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">¿Seguro que deseas eliminar el servicio <b>{{ servicio.nombre }}</b>?</div>
+                        <div class="modal-footer"><button class="btn btn-danger">Eliminar</button></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                {% empty %}
+                <p>No hay servicios registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- TABLA USUARIOS -->
+        <div class="tab-pane fade" id="usuarios" role="tabpanel">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Buscar usuario..." id="searchUsuario" onkeyup="filterList('usuario-list', this.value)">
+            </div>
+            <div class="row" id="usuario-list">
+                {% for usuario in usuarios %}
+                <div class="col-md-4 usuario-item">
+                    <div class="card fade-in position-relative">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fa-solid fa-user me-2"></i>{{ usuario.nombre }} {{ usuario.apellido }}</h5>
+                            <p class="card-text"><strong>RUN:</strong> {{ usuario.run }}</p>
+                            <p class="card-text"><strong>Email:</strong> {{ usuario.email }}</p>
+                            <p class="card-text"><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
+                            {% if is_admin %}
+                            <div class="admin-actions position-absolute top-0 end-0 m-2">
+                                <button class="btn btn-sm btn-warning me-1" data-bs-toggle="modal" data-bs-target="#editUsuarioModal{{ usuario.id }}"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUsuarioModal{{ usuario.id }}"><i class="fa fa-trash"></i></button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Editar Usuario -->
+                <div class="modal fade" id="editUsuarioModal{{ usuario.id }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        <input type="hidden" name="edit_usuario" value="{{ usuario.id_usuario }}">
+                        <div class="modal-header"><h5 class="modal-title">Editar Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">
+                          <div class="mb-2"><input type="text" name="nombre" class="form-control" value="{{ usuario.nombre }}" required></div>
+                          <div class="mb-2"><input type="text" name="apellido" class="form-control" value="{{ usuario.apellido }}" required></div>
+                          <div class="mb-2"><input type="text" name="run" class="form-control" value="{{ usuario.run }}" required></div>
+                          <div class="mb-2"><input type="email" name="email" class="form-control" value="{{ usuario.email }}" required></div>
+                          <div class="mb-2"><input type="number" name="telefono" class="form-control" value="{{ usuario.telefono }}" required></div>
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-success">Guardar cambios</button></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <!-- Modal Eliminar Usuario -->
+                <div class="modal fade" id="deleteUsuarioModal{{ usuario.id }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_usuario" value="{{ usuario.id_usuario }}">
+                        <div class="modal-header bg-danger text-white"><h5 class="modal-title">Eliminar Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">¿Seguro que deseas eliminar a <b>{{ usuario.nombre }} {{ usuario.apellido }}</b>?</div>
+                        <div class="modal-footer"><button class="btn btn-danger">Eliminar</button></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                {% empty %}
+                <p>No hay usuarios registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- APARTADO ADMINISTRADOR: FORMULARIOS DE ALTA -->
+        {% if is_admin %}
+        <div class="tab-pane fade" id="admin" role="tabpanel">
+            <div class="row">
+                <!-- Formulario Usuario -->
+                <div class="col-md-4">
+                    <div class="card fade-in">
+                        <div class="card-header bg-success text-white">Agregar Usuario</div>
+                        <div class="card-body">
+                            <form method="post" autocomplete="off">
+                                {% csrf_token %}
+                                <input type="hidden" name="add_usuario" value="1">
+                                <div class="mb-2"><input type="text" name="run" class="form-control" placeholder="RUN" required></div>
+                                <div class="mb-2"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+                                <div class="mb-2"><input type="text" name="apellido" class="form-control" placeholder="Apellido" required></div>
+                                <div class="mb-2"><input type="email" name="email" class="form-control" placeholder="Email" required></div>
+                                <div class="mb-2"><input type="number" name="telefono" class="form-control" placeholder="Teléfono" required></div>
+                                <div class="mb-2"><input type="password" name="password" class="form-control" placeholder="Contraseña" required></div>
+                                <button class="btn btn-success w-100">Agregar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Formulario Profesional -->
+                <div class="col-md-4">
+                    <div class="card fade-in">
+                        <div class="card-header bg-primary text-white">Agregar Profesional</div>
+                        <div class="card-body">
+                            <form method="post" autocomplete="off">
+                                {% csrf_token %}
+                                <input type="hidden" name="add_profesional" value="1">
+                                <div class="mb-2"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+                                <div class="mb-2"><input type="text" name="especialidad" class="form-control" placeholder="Especialidad" required></div>
+                                <div class="mb-2"><input type="email" name="email" class="form-control" placeholder="Email" required></div>
+                                <div class="mb-2"><input type="password" name="password" class="form-control" placeholder="Contraseña" required></div>
+                                <button class="btn btn-primary w-100">Agregar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Formulario Servicio -->
+                <div class="col-md-4">
+                    <div class="card fade-in">
+                        <div class="card-header bg-info text-white">Agregar Servicio</div>
+                        <div class="card-body">
+                            <form method="post" autocomplete="off">
+                                {% csrf_token %}
+                                <input type="hidden" name="add_servicio" value="1">
+                                <div class="mb-2"><input type="text" name="nombre" class="form-control" placeholder="Nombre" required></div>
+                                <div class="mb-2"><input type="text" name="tipo" class="form-control" placeholder="Tipo" required></div>
+                                <div class="mb-2"><input type="text" name="descripcion" class="form-control" placeholder="Descripción" required></div>
+                                <button class="btn btn-info w-100 text-white">Agregar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Sin scripts personalizados, solo Bootstrap JS -->
+{% endblock %}

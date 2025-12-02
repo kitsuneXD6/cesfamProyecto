@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Mi Perfil | CESFAM{% endblock %}
+
+{% block content %}
+<div class="container mt-4 fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="h2 fw-bold">Mi Perfil</h1>
+            <p class="text-muted">Actualiza tu información personal y de contacto.</p>
+            <hr>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <h5 class="mb-4 section-title">Información General</h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" id="first_name" name="first_name" class="form-control" value="{{ user.first_name }}" placeholder="Nombre">
+                                    <label for="first_name">Nombre</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" id="last_name" name="last_name" class="form-control" value="{{ user.last_name }}" placeholder="Apellido">
+                                    <label for="last_name">Apellido</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}" placeholder="Email" readonly disabled>
+                                    <label for="email">Correo electrónico (no se puede cambiar)</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="tel" id="telefono" name="telefono" class="form-control" value="{{ user.telefono|default:'' }}" placeholder="Teléfono">
+                                    <label for="telefono">Teléfono</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if user.rol == 'paciente' %}
+                        <hr class="my-4">
+                        <h5 class="mb-3 section-title">Información de Paciente</h5>
+                        <div class="form-floating mb-3">
+                            <input type="text" id="run" name="run" class="form-control" value="{{ user.run|default:'' }}" placeholder="RUN">
+                            <label for="run">RUN</label>
+                        </div>
+                        {% endif %}
+
+                        {% if user.rol == 'profesional' %}
+                        <hr class="my-4">
+                        <h5 class="mb-3 section-title">Información Profesional</h5>
+                        <div class="form-floating mb-3">
+                            <input type="text" id="especialidad" name="especialidad" class="form-control" value="{{ user.especialidad|default:'' }}" placeholder="Especialidad">
+                            <label for="especialidad">Especialidad</label>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-gradient btn-lg">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

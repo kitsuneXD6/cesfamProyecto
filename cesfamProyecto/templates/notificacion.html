@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Notificaciones | CESFAM{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg border-0 mb-4 fade-in">
+    <div class="card-header text-white" style="background: linear-gradient(90deg, #00897b 0%, #43cea2 100%);">
+      <span class="fs-5"><i class="fa fa-bell me-2"></i> Notificaciones</span>
+    </div>
+    <div class="card-body">
+      {% if notificaciones %}
+        <ul class="list-group mb-4">
+          {% for n in notificaciones %}
+            <li class="list-group-item">
+              <b>Fecha:</b> {{ n.fecha }}<br>
+              <b>Mensaje:</b> {{ n.mensaje }}<br>
+              {% if rol == 'profesional' %}
+                <b>Para usuario:</b> {{ n.usuario.nombre }}
+              {% elif rol == 'usuario' %}
+                <b>De profesional:</b> {{ n.profesional.nombre }}
+              {% elif rol == 'admin' %}
+                <b>Tipo:</b> {{ n.tipo }}
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="alert alert-info">No hay notificaciones disponibles.</div>
+      {% endif %}
+      <a href="/dashboard" class="btn btn-gradient-dark mt-3"><i class="fa fa-arrow-left"></i> Volver al panel</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
