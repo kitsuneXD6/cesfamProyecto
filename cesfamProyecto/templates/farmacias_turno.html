@@ -16,8 +16,26 @@
                 <a href="https://www.google.com/maps/search/?api=1&query={{ f.local_lat }},{{ f.local_lng }}" target="_blank">Ver en mapa</a>
             </li>
         {% empty %}
-            <li class="list-group-item">No hay farmacias de turno para esta comuna.</li>
+            <li class="list-group-item">
+                {% if comuna %}
+                    No se encontraron farmacias de turno para la comuna de "{{ comuna }}". Por favor, verifica que el nombre esté bien escrito.
+                {% else %}
+                    No hay farmacias de turno disponibles en este momento. Intenta buscar por una comuna específica.
+                {% endif %}
+            </li>
         {% endfor %}
     </ul>
+
+    {% if todas_las_comunas %}
+    <div class="mt-4">
+        <h5>Comunas con farmacias de turno hoy:</h5>
+        <p class="small">
+            {% for nombre_comuna in todas_las_comunas %}
+                {{ nombre_comuna }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}

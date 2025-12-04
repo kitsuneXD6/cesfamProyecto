@@ -786,20 +786,38 @@ def profesional_crear_cita(request):
         return redirect('profesional_agendar')
 
 def farmacias_turno(request):
+    todas_las_comunas = []
     try:
         url = "https://farmanet.minsal.cl/maps/index.php/ws/getLocalesTurnos"
-        response = requests.get(url, timeout=10) # Añadido timeout
-        response.raise_for_status()  # Lanza excepción para respuestas 4xx/5xx
+        print("INFO: Intentando conectar con la API de Farmacias...")
+        response = requests.get(url, timeout=15) # Aumentado el timeout a 15s
+        response.raise_for_status()
         farmacias = response.json()
+        print("INFO: Conexión y decodificación de JSON exitosa.")
+        
+        if farmacias:
+            todas_las_comunas = sorted(list(set(f['comuna_nombre'] for f in farmacias)))
+
         comuna = request.GET.get('comuna', '').lower()
         if comuna:
             farmacias = [f for f in farmacias if f['comuna_nombre'].lower() == comuna]
-    except requests.exceptions.RequestException as e:
-        messages.error(request, f"Error al contactar el servicio de farmacias: {e}")
+            
+    except requests.exceptions.Timeout as e:
+        print(f"ERROR: Timeout al conectar con la API de farmacias: {e}")
+        messages.error(request, "El servicio de farmacias tardó demasiado en responder. Inténtalo de nuevo más tarde.")
         farmacias = []
-    except ValueError: # Atrapa errores de decodificación de JSON
+    except requests.exceptions.RequestException as e:
+        print(f"ERROR: Error de conexión/request al llamar a la API de farmacias: {e}")
+        messages.error(request, f"Error al contactar el servicio de farmacias. Es posible que el servicio no esté disponible o haya un problema de red.")
+        farmacias = []
+    except ValueError as e:
+        print(f"ERROR: Error al decodificar la respuesta JSON de la API: {e}")
         messages.error(request, "Error al procesar la respuesta del servicio de farmacias.")
         farmacias = []
     
-    # El parámetro 'comuna' debe pasarse al template en todos los casos
-    return render(request, 'farmacias_turno.html', {'farmacias': farmacias, 'comuna': request.GET.get('comuna', '')})
+    context = {
+        'farmacias': farmacias, 
+        'comuna': request.GET.get('comuna', ''),
+        'todas_las_comunas': todas_las_comunas
+    }
+    return render(request, 'farmacias_turno.html', context)
