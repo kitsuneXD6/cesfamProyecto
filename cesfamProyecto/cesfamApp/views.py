@@ -788,9 +788,11 @@ def profesional_crear_cita(request):
 def farmacias_turno(request):
     todas_las_comunas = []
     try:
-        url = "https://farmanet.minsal.cl/maps/index.php/ws/getLocalesTurnos"
-        print("INFO: Intentando conectar con la API de Farmacias...")
-        response = requests.get(url, timeout=15) # Aumentado el timeout a 15s
+        # Workaround for DNS issue in Render: Use direct IP and Host header
+        url = "https://162.215.243.194/maps/index.php/ws/getLocalesTurnos"
+        headers = {'Host': 'farmanet.minsal.cl'}
+        print("INFO: Intentando conectar con la API de Farmacias via IP...")
+        response = requests.get(url, headers=headers, timeout=15)
         response.raise_for_status()
         farmacias = response.json()
         print("INFO: Conexión y decodificación de JSON exitosa.")
