@@ -783,3 +783,22 @@ def profesional_crear_cita(request):
     except Exception as e:
         messages.error(request, f'Ocurrió un error inesperado: {e}')
         return redirect('profesional_agendar')
+
+def farmacias_turno(request):
+    try:
+        url = "https://farmanet.minsal.cl/maps/index.php/ws/getLocalesTurnos"
+        response = requests.get(url, timeout=10) # Añadido timeout
+        response.raise_for_status()  # Lanza excepción para respuestas 4xx/5xx
+        farmacias = response.json()
+        comuna = request.GET.get('comuna', '').lower()
+        if comuna:
+            farmacias = [f for f in farmacias if f['comuna_nombre'].lower() == comuna]
+    except requests.exceptions.RequestException as e:
+        messages.error(request, f"Error al contactar el servicio de farmacias: {e}")
+        farmacias = []
+    except ValueError: # Atrapa errores de decodificación de JSON
+        messages.error(request, "Error al procesar la respuesta del servicio de farmacias.")
+        farmacias = []
+    
+    # El parámetro 'comuna' debe pasarse al template en todos los casos
+    return render(request, 'farmacias_turno.html', {'farmacias': farmacias, 'comuna': request.GET.get('comuna', '')})
