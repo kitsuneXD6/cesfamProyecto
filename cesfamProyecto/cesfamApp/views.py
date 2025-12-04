@@ -8,17 +8,11 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import requests
-
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-
-from .models import (
-    Cesfam, Servicio, Anuncio, Cita, Mensaje, Horario, CustomUser, Notificacion,
-    HistorialMedico, Feedback, Conversation, Message
-)
+import urllib3
 from .decorators import paciente_required, profesional_required, admin_required
+
+# Silencia la advertencia de seguridad que aparece al usar verify=False
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from .serializers import (
     UserSerializer, CesfamSerializer, CitaSerializer, ServicioSerializer, 
@@ -791,8 +785,9 @@ def farmacias_turno(request):
         # Workaround for DNS issue in Render: Use direct IP and Host header
         url = "https://162.215.243.194/maps/index.php/ws/getLocalesTurnos"
         headers = {'Host': 'farmanet.minsal.cl'}
-        print("INFO: Intentando conectar con la API de Farmacias via IP...")
-        response = requests.get(url, headers=headers, timeout=15)
+        print("INFO: Intentando conexión con 'verify=False' y timeout=30s...")
+        # verify=False es el último recurso para problemas de red/SSL en Render.
+        response = requests.get(url, headers=headers, timeout=30, verify=False)
         response.raise_for_status()
         farmacias = response.json()
         print("INFO: Conexión y decodificación de JSON exitosa.")
