@@ -9,6 +9,12 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import requests
 import urllib3
+
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
 from .decorators import paciente_required, profesional_required, admin_required
 
 # Silencia la advertencia de seguridad que aparece al usar verify=False
@@ -18,6 +24,11 @@ from .serializers import (
     UserSerializer, CesfamSerializer, CitaSerializer, ServicioSerializer, 
     AnuncioSerializer, HorarioSerializer, NotificacionSerializer, SystemMessageSerializer,
     ConversationSerializer, MessageSerializer
+)
+
+from .models import (
+    Cesfam, Servicio, Anuncio, Cita, Mensaje, Horario, CustomUser, Notificacion,
+    HistorialMedico, Feedback, Conversation, Message
 )
 
 User = get_user_model()
