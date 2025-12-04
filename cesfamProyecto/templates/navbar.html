@@ -21,6 +21,9 @@
                 <li class="nav-item">
                     <a class="nav-link {% if request.path == '/mensajeria/' %}active{% endif %}" href="/mensajeria/">Mensajería</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.view_name == 'farmacias_turno' %}active{% endif %}" href="{% url 'farmacias_turno' %}">Farmacias de Turno</a>
+                </li>
                 {% endif %}
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.view_name == 'ayuda' %}active{% endif %}" href="{% url 'ayuda' %}">Ayuda</a>

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+    <h2>Farmacias de Turno {{ comuna|title }}</h2>
+    <form method="get" class="mb-3">
+        <input type="text" name="comuna" placeholder="Buscar por comuna..." value="{{ comuna }}">
+        <button type="submit" class="btn btn-primary btn-sm">Buscar</button>
+    </form>
+    <ul class="list-group">
+        {% for f in farmacias %}
+            <li class="list-group-item">
+                <strong>{{ f.local_nombre }}</strong><br>
+                Dirección: {{ f.local_direccion }}<br>
+                Comuna: {{ f.comuna_nombre }}<br>
+                Teléfono: {{ f.local_telefono }}<br>
+                <a href="https://www.google.com/maps/search/?api=1&query={{ f.local_lat }},{{ f.local_lng }}" target="_blank">Ver en mapa</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item">No hay farmacias de turno para esta comuna.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

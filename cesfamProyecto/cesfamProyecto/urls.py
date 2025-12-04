@@ -59,4 +59,7 @@ urlpatterns = [
     path('admin/profesionales/', views.gestionar_profesionales, name='gestionar_profesionales'),
     path('admin/agendas/', views.supervisar_agendas, name='supervisar_agendas'),
     path('admin/servicios/', views.gestionar_servicios, name='gestionar_servicios'),
+    
+    # Ruta para farmacias de turno
+    path('farmacias-turno/', views.farmacias_turno, name='farmacias_turno'),
 ]
