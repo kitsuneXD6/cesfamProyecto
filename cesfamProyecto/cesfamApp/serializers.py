@@ -13,22 +13,32 @@ class UserSerializer(serializers.ModelSerializer):
     Serializer para el modelo CustomUser.
     Reemplaza a los antiguos UsuarioSerializer y ProfesionalSerializer.
     """
+    servicios_ofrecidos = ServicioSerializer(many=True, read_only=True)
+
     class Meta:
         model = User
-        # Exponemos los campos más importantes. Excluimos 'password' por seguridad.
         fields = [
-            'id', 'username', 'first_name', 'last_name', 'email', 'rol', 
-            'run', 'telefono', 'especialidad', 'is_staff'
+            'id', 'username', 'first_name', 'last_name', 'email', 'rol',
+            'run', 'telefono', 'is_staff', 'password', 'servicios_ofrecidos'
         ]
-        # La contraseña nunca debe ser expuesta en una API.
-        # Su manejo se hace en la vista al crear o actualizar, si es necesario.
         extra_kwargs = {
             'password': {'write_only': True, 'min_length': 8},
         }
 
     def create(self, validated_data):
+        # El viewset debe pasar el request en el contexto del serializador.
+        # Extraemos 'servicios' del POST request original, que puede ser una lista de IDs.
+        servicios_ids = self.context['request'].data.getlist('servicios')
+        
         # Usamos create_user para hashear la contraseña correctamente.
         user = User.objects.create_user(**validated_data)
+
+        # Si se proporcionaron IDs de servicio, los asociamos al nuevo usuario.
+        if servicios_ids:
+            # Filtramos para obtener los objetos Servicio válidos
+            servicios = Servicio.objects.filter(id__in=servicios_ids)
+            user.servicios_ofrecidos.set(servicios)
+            
         return user
 
 # ==============================================================================

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro de Profesional - Mi CESFAM{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center mb-4">Registro de Profesional</h3>
+                    
+                    {% include 'partials/messages.html' %}
+
+                    <form method="post" action="{% url 'register_profesional' %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="apellido" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="apellido" name="apellido" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Servicios / Especialidades</label>
+                            <p class="small text-muted">Selecciona uno o más servicios que ofreces.</p>
+                            {% if servicios %}
+                                <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                                    {% for servicio in servicios %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="servicios" value="{{ servicio.id }}" id="servicio_{{ servicio.id }}">
+                                            <label class="form-check-label" for="servicio_{{ servicio.id }}">
+                                                {{ servicio.nombre }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-danger">No hay servicios disponibles para seleccionar. Por favor, contacta a un administrador.</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Registrarse</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a href="{% url 'login_page' %}" class="text-decoration-none">¿Ya tienes una cuenta? Inicia sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

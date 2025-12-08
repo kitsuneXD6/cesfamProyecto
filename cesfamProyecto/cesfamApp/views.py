@@ -9,376 +9,18 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import requests
 import urllib3
-
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from .decorators import paciente_required, profesional_required, admin_required
-
-# Silencia la advertencia de seguridad que aparece al usar verify=False
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
+from .models import CustomUser as User, Cesfam, Cita, Servicio, Anuncio, Horario, Notificacion, Mensaje, Conversation, Message
 from .serializers import (
-    UserSerializer, CesfamSerializer, CitaSerializer, ServicioSerializer, 
-    AnuncioSerializer, HorarioSerializer, NotificacionSerializer, SystemMessageSerializer,
-    ConversationSerializer, MessageSerializer
+    UserSerializer, CesfamSerializer, CitaSerializer, ServicioSerializer,
+    AnuncioSerializer, HorarioSerializer, NotificacionSerializer,
+    SystemMessageSerializer, ConversationSerializer, MessageSerializer
 )
-
-from .models import (
-    Cesfam, Servicio, Anuncio, Cita, Mensaje, Horario, CustomUser, Notificacion,
-    HistorialMedico, Feedback, Conversation, Message
-)
-
-User = get_user_model()
-
-# Vista principal
-def home(request):
-    return render(request, 'inicio.html', { 'now': timezone.now() })
-
-@login_required(login_url='login_page')
-def dashboard(request):
-    context = {
-        'now': timezone.now(),
-        'anuncios': Anuncio.objects.all().order_by('-fecha_publicacion')[:5],
-        'notificaciones': Notificacion.objects.filter(destinatario=request.user).order_by('-fecha')[:10]
-    }
-
-    if request.user.rol == User.ROL_PACIENTE:
-        context['proximas_citas'] = Cita.objects.filter(paciente=request.user, fecha_hora__gte=timezone.now()).order_by('fecha_hora')[:5]
-        context['historial_citas'] = Cita.objects.filter(paciente=request.user, fecha_hora__lt=timezone.now()).order_by('-fecha_hora')[:10]
-
-    elif request.user.rol == User.ROL_PROFESIONAL:
-        context['citas_hoy'] = Cita.objects.filter(profesional=request.user, fecha_hora__date=timezone.now().date()).count()
-        context['total_citas'] = Cita.objects.filter(profesional=request.user).count()
-        context['pacientes_unicos'] = Cita.objects.filter(profesional=request.user).values('paciente').distinct().count()
-        context['proximas_citas'] = Cita.objects.filter(profesional=request.user, fecha_hora__gte=timezone.now()).order_by('fecha_hora')[:10]
-
-    elif request.user.rol == User.ROL_ADMIN:
-        context['resumen'] = {
-            'total_cesfams': Cesfam.objects.count(),
-            'total_profesionales': User.objects.filter(rol=User.ROL_PROFESIONAL).count(),
-            'total_usuarios': User.objects.filter(rol=User.ROL_PACIENTE).count(),
-            'total_citas': Cita.objects.count(),
-        }
-
-    return render(request, 'dashboard.html', context)
-
-
-@login_required(login_url='login_page')
-def profile_view(request):
-    user = request.user
-    if request.method == 'POST':
-        # Actualizar campos comunes
-        user.first_name = request.POST.get('first_name', user.first_name)
-        user.last_name = request.POST.get('last_name', user.last_name)
-        user.telefono = request.POST.get('telefono', user.telefono)
-
-        # Actualizar campos específicos de rol
-        if user.rol == User.ROL_PACIENTE:
-            user.run = request.POST.get('run', user.run)
-        elif user.rol == User.ROL_PROFESIONAL:
-            user.especialidad = request.POST.get('especialidad', user.especialidad)
-        
-        user.save()
-        messages.success(request, '¡Tu perfil ha sido actualizado con éxito!')
-        return redirect('profile')
-
-    return render(request, 'perfil.html')
-
-
-
-def login_page(request):
-    if request.user.is_authenticated:
-        return redirect('dashboard')
-    
-    if request.method == 'POST':
-        identificador = request.POST.get('identificador')
-        password = request.POST.get('password')
-        
-        if not identificador or not password:
-            messages.error(request, 'Debes ingresar un identificador y una contraseña.')
-            return render(request, 'login_page.html')
-
-        # Buscar usuario por email o RUN
-        user_q = User.objects.filter(
-            Q(email__iexact=identificador) | Q(run__iexact=identificador)
-        )
-        
-        if user_q.exists():
-            # Usar el username para autenticar, ya que es lo que Django espera por defecto.
-            user_to_auth = authenticate(request, username=user_q.first().username, password=password)
-            
-            if user_to_auth is not None:
-                login(request, user_to_auth)
-                messages.success(request, f'Bienvenido, {user_to_auth.first_name}!')
-                return redirect('dashboard')
-
-        messages.error(request, 'Credenciales inválidas.')
-        return render(request, 'login_page.html')
-
-    return render(request, 'login_page.html')
-
-
-def logout_view(request):
-    logout(request)
-    messages.success(request, 'Sesión cerrada correctamente.')
-    return redirect('home')
-
-
-def register_page(request):
-    # Esta vista ahora solo muestra la selección de registro
-    return render(request, 'register_select.html')
-
-
-def register_usuario(request):
-    if request.method == 'POST':
-        # Simple validación, para una app real usar Django Forms es mejor
-        email = request.POST.get('email')
-        run = request.POST.get('run')
-        password = request.POST.get('password')
-        
-        if User.objects.filter(Q(email__iexact=email) | Q(run__iexact=run)).exists():
-            messages.error(request, 'El email o RUN ya están registrados.')
-            return render(request, 'register_usuario.html')
-
-        user = User.objects.create_user(
-            username=email, # Usamos email como username para login
-            email=email,
-            password=password,
-            first_name=request.POST.get('nombre', ''),
-            last_name=request.POST.get('apellido', ''),
-            run=run,
-            telefono=request.POST.get('telefono', ''),
-            rol=User.ROL_PACIENTE
-        )
-        login(request, user)
-        messages.success(request, f'Bienvenido, {user.first_name}! Tu cuenta ha sido creada.')
-        return redirect('dashboard')
-
-    return render(request, 'register_usuario.html')
-
-
-def register_profesional(request):
-    # Vista simplificada. En un caso real, un admin debería crear profesionales.
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        if User.objects.filter(email__iexact=email).exists():
-            messages.error(request, 'El email ya está registrado.')
-            return render(request, 'register_profesional.html')
-
-        user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=request.POST.get('password'),
-            first_name=request.POST.get('nombre', ''),
-            last_name=request.POST.get('apellido', ''), # Podríamos añadir apellido al form
-            especialidad=request.POST.get('especialidad', ''),
-            rol=User.ROL_PROFESIONAL
-        )
-        login(request, user)
-        messages.success(request, f'Bienvenido, {user.first_name}! Tu cuenta ha sido creada.')
-        return redirect('dashboard')
-        
-    return render(request, 'register_profesional.html')
-
-# Vistas que aún no se han refactorizado o dependen de modelos/lógica comentada
-# Se mantienen para no romper las URLs, pero necesitan revisión.
-
-def modal_test(request):
-    return render(request, 'modal_test.html')
-
-def register_select(request):
-    return render(request, 'register_select.html')
-
-def register_admin(request):
-    # La creación de admins debería hacerse a través de la línea de comandos (createsuperuser)
-    # o en un panel de administración. Esta vista es insegura.
-    messages.warning(request, 'La creación de administradores desde esta página está deshabilitada por seguridad.')
-    return redirect('register_page')
-
-@paciente_required
-def cancelar_cita(request):
-    if request.method == 'POST':
-        id_cita = request.POST.get('id_cita')
-        try:
-            cita = Cita.objects.get(pk=id_cita, paciente=request.user)
-            if cita.fecha_hora - timezone.now() < timezone.timedelta(hours=24):
-                messages.error(request, 'Solo puedes cancelar una cita con al menos 24 horas de anticipación.')
-            else:
-                cita.delete()
-                messages.success(request, 'Cita cancelada correctamente.')
-        except Cita.DoesNotExist:
-            messages.error(request, 'No se encontró la cita o no tienes permiso para cancelarla.')
-        except Exception as e:
-            messages.error(request, f'No se pudo cancelar la cita: {e}')
-    return redirect('dashboard')
-
-@profesional_required
-def marcar_atendida(request):
-    if request.method == 'POST':
-        id_cita = request.POST.get('id_cita')
-        try:
-            cita = Cita.objects.get(pk=id_cita, profesional=request.user)
-            cita.fecha_hora = timezone.now() - timezone.timedelta(days=1)
-            cita.save()
-            messages.success(request, 'Cita marcada como atendida.')
-        except Cita.DoesNotExist:
-             messages.error(request, 'No se encontró la cita o no tienes permiso para modificarla.')
-        except Exception as e:
-            messages.error(request, f'No se pudo marcar la cita: {e}')
-    return redirect('dashboard')
-
-@login_required(login_url='login_page')
-def ayuda(request):
-    return render(request, 'ayuda.html')
-
-@login_required(login_url='login_page')
-def mensaje(request):
-    # Lógica de mensajes refactorizada
-    mensajes = Mensaje.objects.filter(destinatario=request.user).order_by('-fecha')
-    return render(request, 'mensaje.html', {'mensajes': mensajes})
-
-@login_required(login_url='login_page')
-def mensajeria(request):
-    """
-    Vista para la mensajería interna entre usuarios, profesionales y administradores.
-    """
-    return render(request, 'mensajeria.html', {'current_user_id': request.user.id})
-
-# TODO: Las siguientes vistas dependen de modelos que no existen (HistorialMedico, Feedback)
-# o necesitan una refactorización más profunda.
-
-@login_required(login_url='login_page')
-def historial_medico(request):
-    historial = []
-    if request.user.rol == User.ROL_PACIENTE:
-        historial = HistorialMedico.objects.filter(paciente=request.user).order_by('-fecha')
-    elif request.user.rol == User.ROL_PROFESIONAL:
-        # Un profesional puede ver el historial de sus pacientes,
-        # pero para simplificar, mostraremos las entradas que él ha creado.
-        historial = HistorialMedico.objects.filter(profesional=request.user).order_by('-fecha')
-    
-    return render(request, 'historial_medico.html', {'historial': historial})
-
-@login_required(login_url='login_page')
-def notificacion(request):
-    notificaciones = Notificacion.objects.filter(destinatario=request.user).order_by('-fecha')
-    return render(request, 'notificacion.html', {'notificaciones': notificaciones})
-
-@login_required(login_url='login_page')
-def horario(request):
-    context = {}
-    if request.user.rol == User.ROL_PROFESIONAL:
-        if request.method == 'POST':
-            id_horario = request.POST.get('id_horario')
-            if id_horario:
-                try:
-                    horario_obj = Horario.objects.get(pk=id_horario, profesional=request.user)
-                    horario_obj.bloqueado = not horario_obj.bloqueado
-                    horario_obj.save()
-                except Horario.DoesNotExist:
-                    messages.error(request, 'No tienes permiso para modificar este horario.')
-        context['horarios'] = Horario.objects.filter(profesional=request.user).order_by('dia','hora_inicio')
-    else: # Pacientes y Admins ven todos los horarios
-        context['horarios'] = Horario.objects.select_related('profesional').all().order_by('profesional__first_name','dia','hora_inicio')
-    
-    return render(request, 'horario.html', context)
-
-@login_required(login_url='login_page')
-def feedback(request):
-    if request.method == 'POST':
-        comentario = request.POST.get('comentario')
-        if comentario:
-            Feedback.objects.create(usuario=request.user, comentario=comentario)
-            messages.success(request, '¡Gracias por tu feedback!')
-            return redirect('feedback')
-
-    feedbacks = Feedback.objects.filter(usuario=request.user).order_by('-fecha')
-    return render(request, 'feedback.html', {'feedbacks': feedbacks})
-
-
-# --- Vistas de Administración ---
-# Estas vistas necesitan una refactorización pesada. Lo ideal es usar el admin de Django.
-# Por ahora se dejan apuntando a una página de "en construcción" o se simplifican.
-
-@admin_required
-def gestionar_anuncios(request):
-    if request.method == 'POST':
-        if 'crear' in request.POST:
-            Anuncio.objects.create(
-                titulo=request.POST.get('titulo'), 
-                contenido=request.POST.get('contenido'), 
-                publicado_por=request.user
-            )
-            messages.success(request, 'Anuncio publicado.')
-        elif 'eliminar' in request.POST:
-            Anuncio.objects.filter(pk=request.POST.get('anuncio_id'), publicado_por__in=User.objects.filter(is_staff=True)).delete()
-            messages.success(request, 'Anuncio eliminado.')
-    
-    context = {'anuncios': Anuncio.objects.all().order_by('-fecha_publicacion')}
-    return render(request, 'gestionar_anuncios.html', context)
-
-@admin_required
-def gestionar_usuarios(request):
-    # La gestión de usuarios ahora se debe hacer desde el admin de Django para más seguridad.
-    # Esta vista es un riesgo de seguridad. Se deshabilita la funcionalidad principal.
-    if request.method == 'POST':
-        messages.warning(request, 'La gestión de usuarios se realiza desde el panel de administración de Django.')
-    
-    context = {'usuarios': User.objects.filter(rol=User.ROL_PACIENTE).order_by('first_name')}
-    return render(request, 'gestionar_usuarios.html', context)
-
-@admin_required
-def gestionar_profesionales(request):
-    if request.method == 'POST':
-        messages.warning(request, 'La gestión de profesionales se realiza desde el panel de administración de Django.')
-    
-    context = {'profesionales': User.objects.filter(rol=User.ROL_PROFESIONAL).order_by('first_name')}
-    return render(request, 'gestionar_profesionales.html', context)
-
-@admin_required
-def gestionar_servicios(request):
-    if request.method == 'POST':
-        if 'crear' in request.POST:
-            Servicio.objects.create(
-                nombre=request.POST.get('nombre'),
-                tipo=request.POST.get('tipo'),
-                descripcion=request.POST.get('descripcion')
-            )
-            messages.success(request, 'Servicio creado.')
-        elif 'eliminar' in request.POST:
-            Servicio.objects.filter(pk=request.POST.get('id_servicio')).delete()
-            messages.success(request, 'Servicio eliminado.')
-    
-    context = {'servicios': Servicio.objects.all().order_by('nombre')}
-    return render(request, 'gestionar_servicios.html', context)
-
-@admin_required
-def dashboard_metricas(request):
-    # Esta vista necesita revisión para ajustarse a los nuevos modelos
-    messages.info(request, 'Las métricas están siendo actualizadas al nuevo sistema.')
-    return render(request, 'dashboard_metricas.html', {})
-
-@admin_required
-def supervisar_agendas(request):
-    profesional_id = request.GET.get('profesional')
-    profesionales = User.objects.filter(rol=User.ROL_PROFESIONAL).order_by('first_name')
-    horarios = Horario.objects.all().order_by('profesional__first_name','dia','hora_inicio')
-    if profesional_id:
-        horarios = horarios.filter(profesional_id=profesional_id)
-
-    return render(request, 'supervisar_agendas.html', {
-        'profesionales': profesionales,
-        'horarios': horarios,
-        'profesional_id': profesional_id,
-    })
-
-
-# ==============================================================================
-# API ViewSets
-# ==============================================================================
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -829,3 +471,88 @@ def farmacias_turno(request):
         'todas_las_comunas': todas_las_comunas
     }
     return render(request, 'farmacias_turno.html', context)
+
+def home(request):
+    """Vista principal de bienvenida."""
+    return render(request, 'inicio.html')
+
+def login_page(request):
+    return render(request, 'login_page.html')
+
+def logout_view(request):
+    # Puedes agregar lógica de logout real luego
+    return redirect('home')
+
+def register_page(request):
+    return render(request, 'register_page.html')
+
+def register_select(request):
+    return render(request, 'register_select.html')
+
+def register_usuario(request):
+    return render(request, 'register_usuario.html')
+
+def register_profesional(request):
+    servicios = Servicio.objects.all()
+    context = {
+        'servicios': servicios
+    }
+    return render(request, 'register_profesional.html', context)
+
+def register_admin(request):
+    return render(request, 'register_admin.html')
+
+def dashboard(request):
+    return render(request, 'dashboard.html')
+
+def profile_view(request):
+    return render(request, 'perfil.html')
+
+def dashboard_metricas(request):
+    return render(request, 'dashboard_metricas.html')
+
+def modal_test(request):
+    return render(request, 'modal_test.html')
+
+def cancelar_cita(request):
+    # Lógica real se puede agregar después
+    return redirect('dashboard')
+
+def marcar_atendida(request):
+    return redirect('dashboard')
+
+def ayuda(request):
+    return render(request, 'ayuda.html')
+
+def mensaje(request):
+    return render(request, 'mensaje.html')
+
+def mensajeria(request):
+    return render(request, 'mensajes.html')
+
+def historial_medico(request):
+    return render(request, 'historial_medico.html')
+
+def notificacion(request):
+    return render(request, 'notificacion.html')
+
+def horario(request):
+    return render(request, 'horario.html')
+
+def feedback(request):
+    return render(request, 'feedback.html')
+
+def gestionar_anuncios(request):
+    return render(request, 'gestionar_anuncios.html')
+
+def gestionar_usuarios(request):
+    return render(request, 'gestionar_usuarios.html')
+
+def gestionar_profesionales(request):
+    return render(request, 'gestionar_profesionales.html')
+
+def supervisar_agendas(request):
+    return render(request, 'supervisar_agendas.html')
+
+def gestionar_servicios(request):
+    return render(request, 'gestionar_servicios.html')

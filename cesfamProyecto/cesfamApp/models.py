@@ -31,7 +31,6 @@ class CustomUser(AbstractUser):
     rol = models.CharField(max_length=20, choices=ROL_CHOICES, default=ROL_PACIENTE, verbose_name="Rol")
     run = models.CharField(max_length=12, unique=True, null=True, blank=True, verbose_name="RUN")
     telefono = models.CharField(max_length=20, null=True, blank=True, verbose_name="Teléfono")
-    especialidad = models.CharField(max_length=100, null=True, blank=True, verbose_name="Especialidad (si es profesional)")
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.get_rol_display()})"
