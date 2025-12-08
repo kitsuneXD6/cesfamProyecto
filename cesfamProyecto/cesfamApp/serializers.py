@@ -5,6 +5,15 @@ from .models import Cesfam, Servicio, Cita, Horario, Anuncio, Notificacion, Mens
 User = get_user_model()
 
 # ==============================================================================
+# SERIALIZERS PARA LOS OTROS MODELOS (ACTUALIZADOS)
+# ==============================================================================
+
+class ServicioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Servicio
+        fields = '__all__'
+
+# ==============================================================================
 # SERIALIZER PARA EL MODELO DE USUARIO
 # ==============================================================================
 
@@ -41,18 +50,9 @@ class UserSerializer(serializers.ModelSerializer):
             
         return user
 
-# ==============================================================================
-# SERIALIZERS PARA LOS OTROS MODELOS (ACTUALIZADOS)
-# ==============================================================================
-
 class CesfamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cesfam
-        fields = '__all__'
-
-class ServicioSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Servicio
         fields = '__all__'
 
 class CitaSerializer(serializers.ModelSerializer):
