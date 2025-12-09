@@ -493,11 +493,56 @@ def register_usuario(request):
     return render(request, 'register_usuario.html')
 
 def register_profesional(request):
-    servicios = Servicio.objects.all()
-    context = {
-        'servicios': servicios
-    }
-    return render(request, 'register_profesional.html', context)
+    if request.method == 'POST':
+        # Extraer datos del formulario
+        first_name = request.POST.get('nombre')
+        last_name = request.POST.get('apellido')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        servicios_ids = request.POST.getlist('servicios')
+
+        # Validación básica
+        if not all([first_name, last_name, email, password, servicios_ids]):
+            messages.error(request, 'Todos los campos son obligatorios.')
+            servicios = Servicio.objects.all()
+            return render(request, 'register_profesional.html', {'servicios': servicios})
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Ya existe un usuario con este correo electrónico.')
+            servicios = Servicio.objects.all()
+            return render(request, 'register_profesional.html', {'servicios': servicios})
+
+        try:
+            # Crear usuario (el username será el email)
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                rol=User.ROL_PROFESIONAL
+            )
+
+            # Asignar servicios
+            servicios = Servicio.objects.filter(id__in=servicios_ids)
+            user.servicios_ofrecidos.set(servicios)
+
+            # Iniciar sesión y redirigir
+            login(request, user)
+            messages.success(request, '¡Registro completado con éxito! Has iniciado sesión.')
+            return redirect('dashboard')
+
+        except Exception as e:
+            messages.error(request, f'Ocurrió un error durante el registro: {e}')
+            servicios = Servicio.objects.all()
+            return render(request, 'register_profesional.html', {'servicios': servicios})
+
+    else: # GET request
+        servicios = Servicio.objects.all()
+        context = {
+            'servicios': servicios
+        }
+        return render(request, 'register_profesional.html', context)
 
 def register_admin(request):
     return render(request, 'register_admin.html')
