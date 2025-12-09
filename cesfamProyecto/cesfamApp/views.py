@@ -490,6 +490,45 @@ def register_select(request):
     return render(request, 'register_select.html')
 
 def register_usuario(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('nombre')
+        last_name = request.POST.get('apellido')
+        email = request.POST.get('email')
+        run = request.POST.get('run')
+        telefono = request.POST.get('telefono')
+        password = request.POST.get('password')
+
+        if not all([first_name, last_name, email, run, telefono, password]):
+            messages.error(request, 'Todos los campos son obligatorios.')
+            return render(request, 'register_usuario.html')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Ya existe un usuario con este correo electrónico.')
+            return render(request, 'register_usuario.html')
+        
+        if User.objects.filter(run=run).exists():
+            messages.error(request, 'Ya existe un usuario con este RUN.')
+            return render(request, 'register_usuario.html')
+
+        try:
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                run=run,
+                telefono=telefono,
+                rol=User.ROL_PACIENTE
+            )
+            login(request, user)
+            messages.success(request, '¡Registro completado con éxito! Has iniciado sesión.')
+            return redirect('dashboard')
+
+        except Exception as e:
+            messages.error(request, f'Ocurrió un error durante el registro: {e}')
+            return render(request, 'register_usuario.html')
+
     return render(request, 'register_usuario.html')
 
 def register_profesional(request):
